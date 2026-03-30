@@ -1,137 +1,266 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>通行許可証 有効化</title>
-<script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
-
-<style>
-body {
-  font-family: sans-serif;
-  background:#f5f7fb;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  height:100vh;
-  margin:0;
-}
-.card {
-  background:white;
-  padding:24px;
-  border-radius:16px;
-  width:90%;
-  max-width:400px;
-  text-align:center;
-  box-shadow:0 10px 30px rgba(0,0,0,0.08);
-}
-input {
-  width:100%;
-  padding:12px;
-  font-size:18px;
-  margin-top:12px;
-  border-radius:8px;
-  border:1px solid #ddd;
-}
-button {
-  margin-top:16px;
-  padding:12px;
-  width:100%;
-  border:none;
-  border-radius:8px;
-  background:#4f46e5;
-  color:white;
-  font-size:16px;
-}
-.hidden { display:none; }
-</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>COMPASSION WORLD スキャン</title>
+  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+  <style>
+    :root{
+      --bg:#f6f8fb;
+      --card:#ffffff;
+      --text:#1f2937;
+      --muted:#6b7280;
+      --line:#e5e7eb;
+      --accent:#4f46e5;
+      --ok:#16a34a;
+      --ng:#dc2626;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      min-height:100vh;
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      background:var(--bg);
+      color:var(--text);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:16px;
+    }
+    .card{
+      width:100%;
+      max-width:560px;
+      background:var(--card);
+      border-radius:24px;
+      padding:24px 18px 28px;
+      box-shadow:0 12px 32px rgba(0,0,0,.08);
+      text-align:center;
+    }
+    .badge{
+      display:inline-block;
+      font-size:12px;
+      padding:6px 12px;
+      border-radius:999px;
+      background:#eef2ff;
+      color:#4338ca;
+      margin-bottom:14px;
+    }
+    h1{
+      font-size:24px;
+      line-height:1.6;
+      margin:0 0 10px;
+      font-weight:700;
+    }
+    p{
+      margin:0;
+      line-height:1.8;
+      color:var(--muted);
+      font-size:15px;
+    }
+    #reader{
+      width:100%;
+      margin:22px auto 0;
+      overflow:hidden;
+      border-radius:18px;
+      border:1px solid var(--line);
+      background:#fff;
+    }
+    .status{
+      margin-top:18px;
+      min-height:96px;
+      border-radius:18px;
+      padding:18px 14px;
+      background:#f8fafc;
+      border:1px solid var(--line);
+    }
+    .status.ok{
+      background:#f0fdf4;
+      border-color:#bbf7d0;
+      color:var(--ok);
+    }
+    .status.ng{
+      background:#fef2f2;
+      border-color:#fecaca;
+      color:var(--ng);
+    }
+    .status strong{
+      display:block;
+      font-size:20px;
+      margin-bottom:8px;
+      color:inherit;
+    }
+    .sub{
+      margin-top:8px;
+      font-size:14px;
+      color:var(--muted);
+    }
+    .mode{
+      margin-top:10px;
+      font-size:13px;
+      color:#4338ca;
+    }
+  </style>
 </head>
-
 <body>
-<div class="card">
+  <div class="card">
+    <div class="badge">COMPASSION WORLD</div>
+    <h1 id="title">会員証をかざしてください</h1>
+    <p id="desc">QRを読み取って処理を行います。</p>
+    <div class="mode" id="modeLabel"></div>
 
-<div id="inputPhase">
-  <h2>通行許可証を有効化</h2>
-  <p>会員コードを入力してください</p>
-  <input id="codeInput" placeholder="例：650A0DB2F6">
-  <button onclick="submitCode()">有効化する</button>
-</div>
+    <div id="reader"></div>
 
-<div id="loadingPhase" class="hidden">
-  <p>通行許可証の有効化を行っています。<br>しばらくお待ちください。</p>
-</div>
+    <div class="status" id="statusBox">
+      <strong>待機中</strong>
+      <div id="statusText">カメラに会員証のQRコードを向けてください。</div>
+      <div class="sub" id="statusSub"></div>
+    </div>
+  </div>
 
-<div id="successPhase" class="hidden">
-  <h2>お待たせしました！</h2>
-  <p>通行許可証が使えるようになりました。</p>
-</div>
+  <script>
+    const WORKER_URL = "https://compassion-world-proxy.combetter27.workers.dev/";
+    const ADMIN_SECRET = "compassion-world-2026-secret";
 
-<div id="errorPhase" class="hidden">
-  <h2>エラー</h2>
-  <p id="errorText"></p>
-</div>
+    const params = new URLSearchParams(location.search);
+    const mode = params.get("mode") || "entry";
 
-</div>
+    const modeMap = {
+      entry: {
+        label: "入店モード",
+        title: "会員証をかざしてください",
+        desc: "QRを読み取って入店確認を行います。",
+        action: "entry_check"
+      },
+      upgrade: {
+        label: "住民登録証に変更",
+        title: "会員証をかざしてください",
+        desc: "QRを読み取って住民登録証に変更します。",
+        action: "upgrade"
+      },
+      downgrade: {
+        label: "通行許可証に変更",
+        title: "会員証をかざしてください",
+        desc: "QRを読み取って通行許可証に変更します。",
+        action: "downgrade"
+      }
+    };
 
-<script>
-const LIFF_ID = "2008818718-fOO0L9iV";
-const GAS_URL = "https://compassion-world-proxy.combetter27.workers.dev/";
+    const conf = modeMap[mode] || modeMap.entry;
 
-async function init() {
-  await liff.init({ liffId: LIFF_ID });
+    document.getElementById("title").textContent = conf.title;
+    document.getElementById("desc").textContent = conf.desc;
+    document.getElementById("modeLabel").textContent = conf.label;
 
-  if (!liff.isLoggedIn()) {
-    liff.login();
-    return;
-  }
-}
+    const statusBox = document.getElementById("statusBox");
+    const statusText = document.getElementById("statusText");
+    const statusSub = document.getElementById("statusSub");
 
-function show(id){
-  ["inputPhase","loadingPhase","successPhase","errorPhase"].forEach(i=>{
-    document.getElementById(i).classList.add("hidden");
-  });
-  document.getElementById(id).classList.remove("hidden");
-}
+    let busy = false;
+    let lastCode = "";
+    let lastAt = 0;
 
-async function submitCode(){
-  const code = document.getElementById("codeInput").value.trim();
-
-  if(!code){
-    alert("会員コードを入力してください");
-    return;
-  }
-
-  show("loadingPhase");
-
-  try{
-    const idToken = liff.getIDToken();
-
-    const res = await fetch(GAS_URL,{
-      method:"POST",
-      headers:{ "Content-Type":"application/json" },
-      body: JSON.stringify({
-        action:"link_line",
-        idToken:idToken,
-        customerCode:code
-      })
-    });
-
-    const data = await res.json();
-
-    if(data.ok){
-      show("successPhase");
-    } else {
-      show("errorPhase");
-      document.getElementById("errorText").innerText = data.error;
+    function setStatus(kind, title, text, sub = "") {
+      statusBox.className = "status" + (kind ? " " + kind : "");
+      statusBox.querySelector("strong").textContent = title;
+      statusText.textContent = text;
+      statusSub.textContent = sub;
     }
 
-  }catch(e){
-    show("errorPhase");
-    document.getElementById("errorText").innerText = e;
-  }
-}
+    async function handleCode(decodedText) {
+      const now = Date.now();
+      if (busy) return;
+      if (decodedText === lastCode && now - lastAt < 5000) return;
 
-init();
-</script>
+      busy = true;
+      lastCode = decodedText;
+      lastAt = now;
+
+      setStatus("", "確認中", "会員情報を確認しています。", "しばらくお待ちください。");
+
+      try {
+        const res = await fetch(WORKER_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            action: conf.action,
+            customerCode: decodedText,
+            secret: ADMIN_SECRET
+          })
+        });
+
+        const data = await res.json();
+
+        if (conf.action === "entry_check") {
+          if (data.ok) {
+            setStatus(
+              "ok",
+              "入店できます",
+              "扉が開きます。お足元に注意して通行してください。",
+              data.name ? `対象: ${data.name}` : ""
+            );
+          } else {
+            setStatus(
+              "ng",
+              "入店できません",
+              data.reason || "不明な理由",
+              ""
+            );
+          }
+        } else if (conf.action === "upgrade") {
+          if (data.ok) {
+            setStatus(
+              "ok",
+              "変更できました",
+              "住民登録証に変更しました。",
+              data.data && data.data.customerCode ? `会員コード: ${data.data.customerCode}` : ""
+            );
+          } else {
+            setStatus("ng", "変更できません", data.error || "不明なエラー");
+          }
+        } else if (conf.action === "downgrade") {
+          if (data.ok) {
+            setStatus(
+              "ok",
+              "変更できました",
+              "通行許可証に変更しました。",
+              data.data && data.data.customerCode ? `会員コード: ${data.data.customerCode}` : ""
+            );
+          } else {
+            setStatus("ng", "変更できません", data.error || "不明なエラー");
+          }
+        }
+      } catch (e) {
+        setStatus("ng", "通信エラー", String(e), "");
+      } finally {
+        setTimeout(() => {
+          busy = false;
+        }, 2500);
+      }
+    }
+
+    const html5QrCode = new Html5Qrcode("reader");
+
+    Html5Qrcode.getCameras().then(devices => {
+      if (!devices || !devices.length) {
+        setStatus("ng", "カメラが見つかりません", "端末のカメラ利用を確認してください。");
+        return;
+      }
+
+      const backCamera = devices.find(d => /back|rear|environment/i.test(d.label));
+      const cameraId = (backCamera || devices[0]).id;
+
+      html5QrCode.start(
+        cameraId,
+        { fps: 10, qrbox: { width: 260, height: 260 } },
+        (decodedText) => handleCode(decodedText),
+        () => {}
+      ).catch(err => {
+        setStatus("ng", "カメラを起動できません", String(err), "");
+      });
+    }).catch(err => {
+      setStatus("ng", "カメラ取得エラー", String(err), "");
+    });
+  </script>
 </body>
 </html>
