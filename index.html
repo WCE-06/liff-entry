@@ -1,290 +1,468 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>COMPASSION WORLD バーコード受付</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>COMPASSION WORLD 入店認証</title>
   <style>
-    :root{
-      --bg:#f6f8fb;
-      --card:#ffffff;
-      --text:#1f2937;
-      --muted:#6b7280;
-      --line:#e5e7eb;
-      --accent:#4f46e5;
-      --ok:#16a34a;
-      --ng:#dc2626;
+    :root {
+      --bg: #0f172a;
+      --panel: #111827;
+      --text: #e5e7eb;
+      --muted: #94a3b8;
+      --accent: #38bdf8;
+      --ok: #22c55e;
+      --ng: #ef4444;
+      --busy: #f59e0b;
+      --border: rgba(255,255,255,0.08);
     }
-    *{box-sizing:border-box}
-    body{
-      margin:0;
-      min-height:100vh;
-      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-      background:var(--bg);
-      color:var(--text);
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding:16px;
+
+    * {
+      box-sizing: border-box;
     }
-    .card{
-      width:100%;
-      max-width:560px;
-      background:var(--card);
-      border-radius:24px;
-      padding:28px 20px 32px;
-      box-shadow:0 12px 32px rgba(0,0,0,.08);
-      text-align:center;
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, #1e293b, var(--bg));
+      color: var(--text);
     }
-    .badge{
-      display:inline-block;
-      font-size:12px;
-      padding:6px 12px;
-      border-radius:999px;
-      background:#eef2ff;
-      color:#4338ca;
-      margin-bottom:14px;
+
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
     }
-    h1{
-      font-size:24px;
-      line-height:1.6;
-      margin:0 0 10px;
-      font-weight:700;
+
+    .app {
+      width: 100%;
+      max-width: 760px;
+      background: rgba(17, 24, 39, 0.94);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 28px;
+      box-shadow: 0 30px 60px rgba(0,0,0,0.35);
     }
-    p{
-      margin:0;
-      line-height:1.8;
-      color:var(--muted);
-      font-size:15px;
+
+    .header {
+      text-align: center;
+      margin-bottom: 24px;
     }
-    .input-wrap{
-      margin-top:22px;
+
+    .title {
+      font-size: 32px;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+      margin: 0 0 10px;
     }
-    input{
-      width:100%;
-      font-size:22px;
-      padding:16px 14px;
-      border-radius:16px;
-      border:2px solid #c7d2fe;
-      outline:none;
-      text-align:center;
-      letter-spacing:.04em;
-      background:#fff;
+
+    .subtitle {
+      font-size: 15px;
+      color: var(--muted);
+      margin: 0;
     }
-    input:focus{
-      border-color:#6366f1;
-      box-shadow:0 0 0 4px rgba(99,102,241,.12);
+
+    .status-card {
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 24px;
+      min-height: 240px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 14px;
+      transition: all 0.2s ease;
+      background: rgba(255,255,255,0.02);
     }
-    .hint{
-      margin-top:10px;
-      font-size:13px;
-      color:#6366f1;
+
+    .status-card.idle {
+      border-color: rgba(56, 189, 248, 0.25);
+      box-shadow: inset 0 0 0 1px rgba(56, 189, 248, 0.06);
     }
-    .status{
-      margin-top:20px;
-      min-height:110px;
-      border-radius:18px;
-      padding:18px 14px;
-      background:#f8fafc;
-      border:1px solid var(--line);
+
+    .status-card.busy {
+      border-color: rgba(245, 158, 11, 0.35);
+      box-shadow: 0 0 0 1px rgba(245, 158, 11, 0.08);
     }
-    .status.ok{
-      background:#f0fdf4;
-      border-color:#bbf7d0;
-      color:var(--ok);
+
+    .status-card.ok {
+      border-color: rgba(34, 197, 94, 0.4);
+      box-shadow: 0 0 0 1px rgba(34, 197, 94, 0.1);
     }
-    .status.ng{
-      background:#fef2f2;
-      border-color:#fecaca;
-      color:var(--ng);
+
+    .status-card.ng {
+      border-color: rgba(239, 68, 68, 0.4);
+      box-shadow: 0 0 0 1px rgba(239, 68, 68, 0.1);
     }
-    .status strong{
-      display:block;
-      font-size:20px;
-      margin-bottom:8px;
-      color:inherit;
+
+    .status-badge {
+      align-self: center;
+      padding: 8px 14px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      color: white;
+      background: rgba(56, 189, 248, 0.25);
     }
-    .sub{
-      margin-top:8px;
-      font-size:14px;
-      color:var(--muted);
+
+    .status-badge.busy { background: rgba(245, 158, 11, 0.22); }
+    .status-badge.ok { background: rgba(34, 197, 94, 0.24); }
+    .status-badge.ng { background: rgba(239, 68, 68, 0.24); }
+
+    .message-main {
+      text-align: center;
+      font-size: 36px;
+      font-weight: 800;
+      line-height: 1.3;
+      margin: 0;
     }
-    .mode{
-      margin-top:10px;
-      font-size:13px;
-      color:#4338ca;
+
+    .message-sub {
+      text-align: center;
+      font-size: 18px;
+      color: var(--muted);
+      margin: 0;
+      min-height: 1.5em;
     }
-    .hidden-input{
-      position:absolute;
-      left:-9999px;
-      opacity:0;
-      pointer-events:none;
+
+    .code-box {
+      margin-top: 20px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .label {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .input-wrap {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .code-input {
+      flex: 1;
+      min-width: 240px;
+      height: 56px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.04);
+      color: var(--text);
+      padding: 0 16px;
+      font-size: 20px;
+      outline: none;
+    }
+
+    .code-input:focus {
+      border-color: rgba(56, 189, 248, 0.5);
+      box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.08);
+    }
+
+    .btn {
+      height: 56px;
+      border: none;
+      border-radius: 14px;
+      padding: 0 20px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      background: var(--accent);
+      color: #082f49;
+    }
+
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .footer {
+      margin-top: 18px;
+      text-align: center;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .small {
+      font-size: 12px;
+      color: var(--muted);
+      text-align: center;
+      margin-top: 10px;
+      word-break: break-all;
+    }
+
+    @media (max-width: 640px) {
+      .app {
+        padding: 18px;
+        border-radius: 18px;
+      }
+
+      .title {
+        font-size: 24px;
+      }
+
+      .message-main {
+        font-size: 28px;
+      }
+
+      .message-sub {
+        font-size: 16px;
+      }
+
+      .code-input, .btn {
+        width: 100%;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="card" id="card">
-    <div class="badge">COMPASSION WORLD</div>
-    <h1 id="title">会員証のバーコードを読み取ってください</h1>
-    <p id="desc">USBバーコードリーダーで読み取ると自動で処理します。</p>
-    <div class="mode" id="modeLabel"></div>
+  <main class="app">
+    <header class="header">
+      <h1 class="title">COMPASSION WORLD</h1>
+      <p class="subtitle">会員証のバーコードを読み取ってください</p>
+    </header>
 
-    <div class="input-wrap">
-      <input id="scanInput" type="text" inputmode="none" autocomplete="off" placeholder="バーコード待機中">
-      <div class="hint">入力欄をタップすると再待機します。</div>
-    </div>
+    <section id="statusCard" class="status-card idle">
+      <div id="statusBadge" class="status-badge">待機中</div>
+      <p id="messageMain" class="message-main">バーコードを読み取ってください</p>
+      <p id="messageSub" class="message-sub">USBバーコードリーダーの入力を受け付けています</p>
+    </section>
 
-    <div class="status" id="statusBox">
-      <strong>待機中</strong>
-      <div id="statusText">会員証のバーコードを読み取ってください。</div>
-      <div class="sub" id="statusSub">バーコードリーダーはキーボード入力として動作します。</div>
+    <section class="code-box">
+      <div class="label">読み取りコード</div>
+      <div class="input-wrap">
+        <input
+          id="codeInput"
+          class="code-input"
+          type="text"
+          inputmode="text"
+          autocomplete="off"
+          autocapitalize="characters"
+          spellcheck="false"
+          placeholder="ここに自動入力されます"
+        />
+        <button id="submitBtn" class="btn" type="button">認証する</button>
+      </div>
+      <div id="debugText" class="small">mode: entry</div>
+    </section>
+
+    <div class="footer">
+      読み取り後、自動で入店判定を行います
     </div>
-  </div>
+  </main>
 
   <script>
-    const WORKER_URL = "https://compassion-world-proxy.combetter27.workers.dev/";
-    const ADMIN_SECRET = "compassion-world-2026-secret";
+    const WORKER_URL = 'https://compassion-world-proxy.combetter27.workers.dev/';
+    const MODE = new URLSearchParams(location.search).get('mode') || 'entry';
 
-    const params = new URLSearchParams(location.search);
-    const mode = params.get("mode") || "entry";
+    const codeInput = document.getElementById('codeInput');
+    const submitBtn = document.getElementById('submitBtn');
+    const statusCard = document.getElementById('statusCard');
+    const statusBadge = document.getElementById('statusBadge');
+    const messageMain = document.getElementById('messageMain');
+    const messageSub = document.getElementById('messageSub');
+    const debugText = document.getElementById('debugText');
 
-    const modeMap = {
-      entry: {
-        label: "入店モード",
-        title: "会員証のバーコードを読み取ってください",
-        desc: "バーコードを読み取って入店確認を行います。",
-        action: "entry_check"
-      },
-      upgrade: {
-        label: "住民登録証に変更",
-        title: "会員証のバーコードを読み取ってください",
-        desc: "バーコードを読み取って住民登録証に変更します。",
-        action: "upgrade"
-      },
-      downgrade: {
-        label: "通行許可証に変更",
-        title: "会員証のバーコードを読み取ってください",
-        desc: "バーコードを読み取って通行許可証に変更します。",
-        action: "downgrade"
+    let isSubmitting = false;
+    let lastSubmittedCode = '';
+    let lastSubmittedAt = 0;
+    let resetTimer = null;
+
+    debugText.textContent = `mode: ${MODE}`;
+
+    function normalizeCustomerCode(value) {
+      return String(value || '')
+        .trim()
+        .replace(/\r/g, '')
+        .replace(/\n/g, '')
+        .replace(/\s+/g, '')
+        .toUpperCase();
+    }
+
+    function setStatus(type, main, sub) {
+      statusCard.className = `status-card ${type}`;
+      statusBadge.className = `status-badge ${type}`;
+      statusBadge.textContent =
+        type === 'busy' ? '認証中' :
+        type === 'ok' ? '入店可' :
+        type === 'ng' ? '入店不可' :
+        '待機中';
+
+      messageMain.textContent = main;
+      messageSub.textContent = sub || '';
+    }
+
+    function focusInput() {
+      codeInput.focus({ preventScroll: true });
+    }
+
+    function clearAndReset(ms = 2500) {
+      if (resetTimer) {
+        clearTimeout(resetTimer);
       }
-    };
 
-    const conf = modeMap[mode] || modeMap.entry;
-
-    document.getElementById("title").textContent = conf.title;
-    document.getElementById("desc").textContent = conf.desc;
-    document.getElementById("modeLabel").textContent = conf.label;
-
-    const input = document.getElementById("scanInput");
-    const statusBox = document.getElementById("statusBox");
-    const statusText = document.getElementById("statusText");
-    const statusSub = document.getElementById("statusSub");
-
-    let busy = false;
-    let lastCode = "";
-    let lastAt = 0;
-
-    function setStatus(kind, title, text, sub = "") {
-      statusBox.className = "status" + (kind ? " " + kind : "");
-      statusBox.querySelector("strong").textContent = title;
-      statusText.textContent = text;
-      statusSub.textContent = sub;
+      resetTimer = setTimeout(() => {
+        codeInput.value = '';
+        setStatus('idle', 'バーコードを読み取ってください', 'USBバーコードリーダーの入力を受け付けています');
+        focusInput();
+      }, ms);
     }
 
-    function refocusInput() {
-      input.focus();
-      input.select();
+    function playTone(freq, duration) {
+      try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+
+        osc.type = 'sine';
+        osc.frequency.value = freq;
+        gain.gain.value = 0.04;
+
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        osc.start();
+
+        setTimeout(() => {
+          osc.stop();
+          ctx.close();
+        }, duration);
+      } catch (e) {
+      }
     }
 
-    async function processCode(code) {
+    function playSuccessSound() {
+      playTone(880, 100);
+      setTimeout(() => playTone(1174, 120), 110);
+    }
+
+    function playErrorSound() {
+      playTone(280, 160);
+      setTimeout(() => playTone(220, 180), 170);
+    }
+
+    function isDuplicateRecently(code) {
       const now = Date.now();
-      if (!code) return;
-      if (busy) return;
-      if (code === lastCode && now - lastAt < 3000) return;
+      return code &&
+        code === lastSubmittedCode &&
+        (now - lastSubmittedAt) < 2000;
+    }
 
-      busy = true;
-      lastCode = code;
-      lastAt = now;
+    async function submitCode(rawCode) {
+      const customerCode = normalizeCustomerCode(rawCode);
 
-      setStatus("", "確認中", "会員情報を確認しています。", "しばらくお待ちください。");
+      if (!customerCode) {
+        setStatus('ng', 'コードを確認できませんでした', 'バーコードをもう一度読み取ってください');
+        playErrorSound();
+        clearAndReset(2200);
+        return;
+      }
+
+      if (isSubmitting) {
+        return;
+      }
+
+      if (isDuplicateRecently(customerCode)) {
+        setStatus('ng', '連続読み取りを制限中です', '少し待ってからもう一度お試しください');
+        playErrorSound();
+        clearAndReset(1500);
+        return;
+      }
+
+      isSubmitting = true;
+      submitBtn.disabled = true;
+      lastSubmittedCode = customerCode;
+      lastSubmittedAt = Date.now();
+
+      setStatus('busy', '会員確認中です', 'しばらくお待ちください');
 
       try {
-        const res = await fetch(WORKER_URL, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
+        const response = await fetch(WORKER_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
           body: JSON.stringify({
-            action: conf.action,
-            customerCode: code,
-            secret: ADMIN_SECRET
+            action: 'entry_check',
+            customerCode
           })
         });
 
-        const data = await res.json();
+        const data = await response.json().catch(() => ({}));
 
-        if (conf.action === "entry_check") {
-          if (data.ok) {
-            setStatus(
-              "ok",
-              "入店できます",
-              "扉が開きます。お足元に注意して通行してください。",
-              data.name ? `対象: ${data.name}` : ""
-            );
-          } else {
-            setStatus(
-              "ng",
-              "入店できません",
-              data.reason || "不明な理由",
-              ""
-            );
-          }
-        } else if (conf.action === "upgrade") {
-          if (data.ok) {
-            setStatus(
-              "ok",
-              "変更できました",
-              "住民登録証に変更しました。",
-              data.data && data.data.customerCode ? `会員コード: ${data.data.customerCode}` : ""
-            );
-          } else {
-            setStatus("ng", "変更できません", data.error || "不明なエラー");
-          }
-        } else if (conf.action === "downgrade") {
-          if (data.ok) {
-            setStatus(
-              "ok",
-              "変更できました",
-              "通行許可証に変更しました。",
-              data.data && data.data.customerCode ? `会員コード: ${data.data.customerCode}` : ""
-            );
-          } else {
-            setStatus("ng", "変更できません", data.error || "不明なエラー");
-          }
+        if (data && data.ok) {
+          setStatus('ok', 'どうぞお入りください', data.name ? `${data.name} さんを確認しました` : '会員確認が完了しました');
+          playSuccessSound();
+          clearAndReset(3000);
+        } else {
+          const reason = String(data && data.reason ? data.reason : data && data.error ? data.error : 'unknown');
+          const message = mapErrorMessage(reason, data);
+          setStatus('ng', message.main, message.sub);
+          playErrorSound();
+          clearAndReset(3200);
         }
-      } catch (e) {
-        setStatus("ng", "通信エラー", String(e), "");
+
+      } catch (err) {
+        setStatus('ng', '通信に失敗しました', 'ネットワークまたはサーバーの状態をご確認ください');
+        playErrorSound();
+        clearAndReset(3200);
       } finally {
-        input.value = "";
-        setTimeout(() => {
-          busy = false;
-          refocusInput();
-        }, 2000);
+        isSubmitting = false;
+        submitBtn.disabled = false;
       }
     }
 
-    input.addEventListener("keydown", (e) => {
-      if (e.key === "Enter") {
-        e.preventDefault();
-        const code = input.value.trim();
-        processCode(code);
+    function mapErrorMessage(reason, data) {
+      switch (reason) {
+        case 'customer_not_found':
+          return {
+            main: '会員情報が見つかりません',
+            sub: '会員番号をご確認ください'
+          };
+        case 'rank_not_allowed':
+          return {
+            main: '現在は入店できません',
+            sub: data && data.rank ? `ランク: ${data.rank}` : '会員状態をご確認ください'
+          };
+        case 'empty_customer_code':
+          return {
+            main: 'コードを読み取れませんでした',
+            sub: 'もう一度バーコードを読み取ってください'
+          };
+        default:
+          return {
+            main: '入店できませんでした',
+            sub: `理由: ${reason}`
+          };
+      }
+    }
+
+    submitBtn.addEventListener('click', () => {
+      submitCode(codeInput.value);
+    });
+
+    codeInput.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        submitCode(codeInput.value);
       }
     });
 
-    input.addEventListener("blur", () => {
-      setTimeout(refocusInput, 50);
+    codeInput.addEventListener('input', () => {
+      codeInput.value = normalizeCustomerCode(codeInput.value);
     });
 
-    window.addEventListener("click", refocusInput);
-    window.addEventListener("load", refocusInput);
+    window.addEventListener('click', focusInput);
+    window.addEventListener('load', () => {
+      focusInput();
+      setStatus('idle', 'バーコードを読み取ってください', 'USBバーコードリーダーの入力を受け付けています');
+    });
   </script>
 </body>
 </html>
