@@ -2,8 +2,8 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>COMPASSION WORLD 入店認証</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>COMPASSION WORLD 会員処理テスト</title>
   <style>
     :root {
       --bg: #0f172a;
@@ -17,264 +17,257 @@
       --border: rgba(255,255,255,0.08);
     }
 
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
-    html, body {
+    body {
       margin: 0;
-      padding: 0;
-      width: 100%;
-      height: 100%;
+      min-height: 100vh;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       background: radial-gradient(circle at top, #1e293b, var(--bg));
       color: var(--text);
+      padding: 24px;
     }
 
-    body {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-    }
-
-    .app {
-      width: 100%;
-      max-width: 760px;
-      background: rgba(17, 24, 39, 0.94);
+    .wrap {
+      max-width: 780px;
+      margin: 0 auto;
+      background: rgba(17,24,39,0.95);
       border: 1px solid var(--border);
       border-radius: 24px;
-      padding: 28px;
+      padding: 24px;
       box-shadow: 0 30px 60px rgba(0,0,0,0.35);
     }
 
-    .header {
-      text-align: center;
-      margin-bottom: 24px;
-    }
-
-    .title {
-      font-size: 32px;
-      font-weight: 800;
-      letter-spacing: 0.02em;
+    h1 {
       margin: 0 0 10px;
+      font-size: 30px;
+      text-align: center;
     }
 
-    .subtitle {
-      font-size: 15px;
+    .sub {
+      text-align: center;
       color: var(--muted);
-      margin: 0;
+      margin-bottom: 22px;
     }
 
-    .status-card {
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      padding: 24px;
-      min-height: 240px;
+    .modes {
       display: flex;
-      flex-direction: column;
-      justify-content: center;
-      gap: 14px;
-      transition: all 0.2s ease;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 18px;
+    }
+
+    .mode-btn {
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.04);
+      color: var(--text);
+      border-radius: 999px;
+      padding: 10px 14px;
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    .mode-btn.active {
+      background: rgba(56,189,248,0.18);
+      border-color: rgba(56,189,248,0.35);
+    }
+
+    .card {
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 20px;
       background: rgba(255,255,255,0.02);
     }
 
-    .status-card.idle {
-      border-color: rgba(56, 189, 248, 0.25);
-      box-shadow: inset 0 0 0 1px rgba(56, 189, 248, 0.06);
-    }
-
-    .status-card.busy {
-      border-color: rgba(245, 158, 11, 0.35);
-      box-shadow: 0 0 0 1px rgba(245, 158, 11, 0.08);
-    }
-
-    .status-card.ok {
-      border-color: rgba(34, 197, 94, 0.4);
-      box-shadow: 0 0 0 1px rgba(34, 197, 94, 0.1);
-    }
-
-    .status-card.ng {
-      border-color: rgba(239, 68, 68, 0.4);
-      box-shadow: 0 0 0 1px rgba(239, 68, 68, 0.1);
-    }
-
-    .status-badge {
-      align-self: center;
-      padding: 8px 14px;
-      border-radius: 999px;
-      font-size: 13px;
-      font-weight: 700;
-      letter-spacing: 0.04em;
-      color: white;
-      background: rgba(56, 189, 248, 0.25);
-    }
-
-    .status-badge.busy { background: rgba(245, 158, 11, 0.22); }
-    .status-badge.ok { background: rgba(34, 197, 94, 0.24); }
-    .status-badge.ng { background: rgba(239, 68, 68, 0.24); }
-
-    .message-main {
-      text-align: center;
-      font-size: 36px;
-      font-weight: 800;
-      line-height: 1.3;
-      margin: 0;
-    }
-
-    .message-sub {
-      text-align: center;
-      font-size: 18px;
-      color: var(--muted);
-      margin: 0;
-      min-height: 1.5em;
-    }
-
-    .code-box {
-      margin-top: 20px;
-      display: grid;
-      gap: 10px;
-    }
-
-    .label {
-      font-size: 13px;
-      color: var(--muted);
-    }
-
-    .input-wrap {
+    .status {
+      margin-bottom: 18px;
+      padding: 20px;
+      border-radius: 18px;
+      border: 1px solid var(--border);
+      min-height: 140px;
       display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
+      flex-direction: column;
+      justify-content: center;
+      gap: 8px;
     }
 
-    .code-input {
-      flex: 1;
-      min-width: 240px;
-      height: 56px;
+    .status.idle {}
+    .status.busy { border-color: rgba(245,158,11,0.35); }
+    .status.ok { border-color: rgba(34,197,94,0.4); }
+    .status.ng { border-color: rgba(239,68,68,0.4); }
+
+    .badge {
+      display: inline-block;
+      align-self: center;
+      border-radius: 999px;
+      padding: 7px 12px;
+      font-size: 12px;
+      font-weight: 800;
+      background: rgba(56,189,248,0.18);
+    }
+
+    .status.busy .badge { background: rgba(245,158,11,0.2); }
+    .status.ok .badge { background: rgba(34,197,94,0.2); }
+    .status.ng .badge { background: rgba(239,68,68,0.2); }
+
+    .main {
+      text-align: center;
+      font-size: 30px;
+      font-weight: 800;
+      margin: 0;
+    }
+
+    .subtext {
+      text-align: center;
+      color: var(--muted);
+      margin: 0;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .grid {
+      display: grid;
+      gap: 14px;
+    }
+
+    label {
+      display: grid;
+      gap: 6px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    input {
+      height: 52px;
       border-radius: 14px;
       border: 1px solid var(--border);
       background: rgba(255,255,255,0.04);
       color: var(--text);
-      padding: 0 16px;
-      font-size: 20px;
+      padding: 0 14px;
+      font-size: 18px;
       outline: none;
     }
 
-    .code-input:focus {
-      border-color: rgba(56, 189, 248, 0.5);
-      box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.08);
+    input:focus {
+      border-color: rgba(56,189,248,0.45);
+      box-shadow: 0 0 0 4px rgba(56,189,248,0.08);
     }
 
-    .btn {
-      height: 56px;
+    .actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 4px;
+    }
+
+    button.action {
+      height: 52px;
       border: none;
       border-radius: 14px;
-      padding: 0 20px;
-      font-size: 16px;
-      font-weight: 700;
+      padding: 0 18px;
       cursor: pointer;
+      font-size: 16px;
+      font-weight: 800;
       background: var(--accent);
       color: #082f49;
     }
 
-    .btn:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
+    button.subtle {
+      background: rgba(255,255,255,0.08);
+      color: var(--text);
+      border: 1px solid var(--border);
     }
 
-    .footer {
-      margin-top: 18px;
-      text-align: center;
+    .raw {
+      margin-top: 16px;
+      padding: 14px;
+      border-radius: 14px;
+      background: rgba(0,0,0,0.25);
+      color: #cbd5e1;
       font-size: 13px;
-      color: var(--muted);
+      overflow: auto;
+      white-space: pre-wrap;
+      word-break: break-word;
     }
 
-    .small {
-      font-size: 12px;
+    .note {
+      margin-top: 14px;
       color: var(--muted);
+      font-size: 13px;
       text-align: center;
-      margin-top: 10px;
-      word-break: break-all;
-    }
-
-    @media (max-width: 640px) {
-      .app {
-        padding: 18px;
-        border-radius: 18px;
-      }
-
-      .title {
-        font-size: 24px;
-      }
-
-      .message-main {
-        font-size: 28px;
-      }
-
-      .message-sub {
-        font-size: 16px;
-      }
-
-      .code-input, .btn {
-        width: 100%;
-      }
     }
   </style>
 </head>
 <body>
-  <main class="app">
-    <header class="header">
-      <h1 class="title">COMPASSION WORLD</h1>
-      <p class="subtitle">会員証のバーコードを読み取ってください</p>
-    </header>
+  <div class="wrap">
+    <h1>COMPASSION WORLD</h1>
+    <div class="sub">GitHub Pages から入店・ランク変更・同期をテスト</div>
 
-    <section id="statusCard" class="status-card idle">
-      <div id="statusBadge" class="status-badge">待機中</div>
-      <p id="messageMain" class="message-main">バーコードを読み取ってください</p>
-      <p id="messageSub" class="message-sub">USBバーコードリーダーの入力を受け付けています</p>
-    </section>
-
-    <section class="code-box">
-      <div class="label">読み取りコード</div>
-      <div class="input-wrap">
-        <input
-          id="codeInput"
-          class="code-input"
-          type="text"
-          inputmode="text"
-          autocomplete="off"
-          autocapitalize="characters"
-          spellcheck="false"
-          placeholder="ここに自動入力されます"
-        />
-        <button id="submitBtn" class="btn" type="button">認証する</button>
-      </div>
-      <div id="debugText" class="small">mode: entry</div>
-    </section>
-
-    <div class="footer">
-      読み取り後、自動で入店判定を行います
+    <div class="modes">
+      <button class="mode-btn" data-mode="entry">entry</button>
+      <button class="mode-btn" data-mode="upgrade">upgrade</button>
+      <button class="mode-btn" data-mode="downgrade">downgrade</button>
+      <button class="mode-btn" data-mode="sync_all">sync_all</button>
     </div>
-  </main>
+
+    <div id="statusBox" class="status idle">
+      <div id="badge" class="badge">待機中</div>
+      <p id="mainText" class="main">操作を選んでください</p>
+      <p id="subText" class="subtext">バーコード読み取りまたはボタン操作でテストできます</p>
+    </div>
+
+    <div class="card">
+      <div class="grid">
+        <label>
+          会員番号
+          <input id="customerCode" type="text" placeholder="例: 650A0DB2F6" autocomplete="off" />
+        </label>
+
+        <label id="expiresWrap">
+          expiresAt
+          <input id="expiresAt" type="text" placeholder="例: 2026-12-31" autocomplete="off" />
+        </label>
+
+        <label id="noteWrap">
+          note
+          <input id="note" type="text" placeholder="任意" autocomplete="off" />
+        </label>
+      </div>
+
+      <div class="actions">
+        <button id="execBtn" class="action">実行</button>
+        <button id="clearBtn" class="action subtle">クリア</button>
+      </div>
+
+      <pre id="rawResult" class="raw">結果がここに表示されます</pre>
+    </div>
+
+    <div class="note">
+      entry は USBバーコードリーダーの Enter 確定にも対応しています
+    </div>
+  </div>
 
   <script>
     const WORKER_URL = 'https://compassion-world-proxy.combetter27.workers.dev/';
-    const MODE = new URLSearchParams(location.search).get('mode') || 'entry';
+    const params = new URLSearchParams(location.search);
 
-    const codeInput = document.getElementById('codeInput');
-    const submitBtn = document.getElementById('submitBtn');
-    const statusCard = document.getElementById('statusCard');
-    const statusBadge = document.getElementById('statusBadge');
-    const messageMain = document.getElementById('messageMain');
-    const messageSub = document.getElementById('messageSub');
-    const debugText = document.getElementById('debugText');
+    const customerCodeEl = document.getElementById('customerCode');
+    const expiresAtEl = document.getElementById('expiresAt');
+    const noteEl = document.getElementById('note');
+    const execBtn = document.getElementById('execBtn');
+    const clearBtn = document.getElementById('clearBtn');
+    const rawResult = document.getElementById('rawResult');
+    const statusBox = document.getElementById('statusBox');
+    const badge = document.getElementById('badge');
+    const mainText = document.getElementById('mainText');
+    const subText = document.getElementById('subText');
+    const expiresWrap = document.getElementById('expiresWrap');
+    const noteWrap = document.getElementById('noteWrap');
 
+    let mode = params.get('mode') || 'entry';
     let isSubmitting = false;
     let lastSubmittedCode = '';
     let lastSubmittedAt = 0;
-    let resetTimer = null;
-
-    debugText.textContent = `mode: ${MODE}`;
 
     function normalizeCustomerCode(value) {
       return String(value || '')
@@ -286,65 +279,48 @@
     }
 
     function setStatus(type, main, sub) {
-      statusCard.className = `status-card ${type}`;
-      statusBadge.className = `status-badge ${type}`;
-      statusBadge.textContent =
-        type === 'busy' ? '認証中' :
-        type === 'ok' ? '入店可' :
-        type === 'ng' ? '入店不可' :
+      statusBox.className = `status ${type}`;
+      badge.textContent =
+        type === 'busy' ? '処理中' :
+        type === 'ok' ? '成功' :
+        type === 'ng' ? '失敗' :
         '待機中';
-
-      messageMain.textContent = main;
-      messageSub.textContent = sub || '';
+      mainText.textContent = main;
+      subText.textContent = sub || '';
     }
 
-    function focusInput() {
-      codeInput.focus({ preventScroll: true });
-    }
+    function refreshModeUI() {
+      document.querySelectorAll('.mode-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.mode === mode);
+      });
 
-    function clearAndReset(ms = 2500) {
-      if (resetTimer) {
-        clearTimeout(resetTimer);
+      expiresWrap.style.display = mode === 'upgrade' ? 'grid' : 'none';
+      noteWrap.style.display = (mode === 'upgrade' || mode === 'downgrade') ? 'grid' : 'none';
+
+      if (mode === 'sync_all') {
+        customerCodeEl.disabled = true;
+        expiresAtEl.disabled = true;
+        noteEl.disabled = true;
+        customerCodeEl.value = '';
+      } else {
+        customerCodeEl.disabled = false;
+        expiresAtEl.disabled = mode !== 'upgrade';
+        noteEl.disabled = !(mode === 'upgrade' || mode === 'downgrade');
       }
 
-      resetTimer = setTimeout(() => {
-        codeInput.value = '';
+      if (mode === 'entry') {
         setStatus('idle', 'バーコードを読み取ってください', 'USBバーコードリーダーの入力を受け付けています');
-        focusInput();
-      }, ms);
-    }
-
-    function playTone(freq, duration) {
-      try {
-        const ctx = new (window.AudioContext || window.webkitAudioContext)();
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-
-        osc.type = 'sine';
-        osc.frequency.value = freq;
-        gain.gain.value = 0.04;
-
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-
-        osc.start();
-
-        setTimeout(() => {
-          osc.stop();
-          ctx.close();
-        }, duration);
-      } catch (e) {
+      } else if (mode === 'upgrade') {
+        setStatus('idle', 'ランクアップを実行します', '会員番号を入力して実行してください');
+      } else if (mode === 'downgrade') {
+        setStatus('idle', 'ランクダウンを実行します', '会員番号を入力して実行してください');
+      } else {
+        setStatus('idle', '全件同期を実行します', '実行ボタンで同期できます');
       }
     }
 
-    function playSuccessSound() {
-      playTone(880, 100);
-      setTimeout(() => playTone(1174, 120), 110);
-    }
-
-    function playErrorSound() {
-      playTone(280, 160);
-      setTimeout(() => playTone(220, 180), 170);
+    function showRaw(data) {
+      rawResult.textContent = JSON.stringify(data, null, 2);
     }
 
     function isDuplicateRecently(code) {
@@ -354,114 +330,115 @@
         (now - lastSubmittedAt) < 2000;
     }
 
-    async function submitCode(rawCode) {
-      const customerCode = normalizeCustomerCode(rawCode);
+    async function executeAction() {
+      if (isSubmitting) return;
 
-      if (!customerCode) {
-        setStatus('ng', 'コードを確認できませんでした', 'バーコードをもう一度読み取ってください');
-        playErrorSound();
-        clearAndReset(2200);
+      const customerCode = normalizeCustomerCode(customerCodeEl.value);
+      const expiresAt = String(expiresAtEl.value || '').trim();
+      const note = String(noteEl.value || '').trim();
+
+      if (mode !== 'sync_all' && !customerCode) {
+        setStatus('ng', '会員番号が未入力です', 'customerCode を確認してください');
         return;
       }
 
-      if (isSubmitting) {
-        return;
-      }
-
-      if (isDuplicateRecently(customerCode)) {
-        setStatus('ng', '連続読み取りを制限中です', '少し待ってからもう一度お試しください');
-        playErrorSound();
-        clearAndReset(1500);
+      if (mode === 'entry' && isDuplicateRecently(customerCode)) {
+        setStatus('ng', '連続読み取りを制限中です', '少し待ってから再実行してください');
         return;
       }
 
       isSubmitting = true;
-      submitBtn.disabled = true;
+      execBtn.disabled = true;
       lastSubmittedCode = customerCode;
       lastSubmittedAt = Date.now();
 
-      setStatus('busy', '会員確認中です', 'しばらくお待ちください');
+      setStatus('busy', '処理中です', `${mode} を実行しています...`);
 
       try {
-        const response = await fetch(WORKER_URL, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            action: 'entry_check',
-            customerCode
-          })
-        });
-
-        const data = await response.json().catch(() => ({}));
-
-        if (data && data.ok) {
-          setStatus('ok', 'どうぞお入りください', data.name ? `${data.name} さんを確認しました` : '会員確認が完了しました');
-          playSuccessSound();
-          clearAndReset(3000);
+        let response;
+        if (mode === 'entry') {
+          response = await fetch(WORKER_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              action: 'entry_check',
+              customerCode
+            })
+          });
         } else {
-          const reason = String(data && data.reason ? data.reason : data && data.error ? data.error : 'unknown');
-          const message = mapErrorMessage(reason, data);
-          setStatus('ng', message.main, message.sub);
-          playErrorSound();
-          clearAndReset(3200);
+          const url = new URL(WORKER_URL);
+          url.searchParams.set('action', mode);
+          if (customerCode) url.searchParams.set('customerCode', customerCode);
+          if (expiresAt) url.searchParams.set('expiresAt', expiresAt);
+          if (note) url.searchParams.set('note', note);
+          response = await fetch(url.toString(), { method: 'GET' });
         }
 
+        const data = await response.json().catch(() => ({ ok: false, error: 'invalid_json' }));
+        showRaw(data);
+
+        if (data.ok) {
+          if (mode === 'entry') {
+            setStatus('ok', 'どうぞお入りください', data.name ? `${data.name} さんを確認しました` : '会員確認が完了しました');
+          } else if (mode === 'upgrade') {
+            setStatus('ok', 'ランクアップしました', customerCode || '完了');
+          } else if (mode === 'downgrade') {
+            setStatus('ok', 'ランクダウンしました', customerCode || '完了');
+          } else {
+            setStatus('ok', '同期が完了しました', data.synced ? `synced=${data.synced}` : '完了');
+          }
+        } else {
+          setStatus('ng', '処理に失敗しました', data.error || data.reason || 'unknown_error');
+        }
       } catch (err) {
-        setStatus('ng', '通信に失敗しました', 'ネットワークまたはサーバーの状態をご確認ください');
-        playErrorSound();
-        clearAndReset(3200);
+        const data = { ok: false, error: String(err && err.message ? err.message : err) };
+        showRaw(data);
+        setStatus('ng', '通信に失敗しました', data.error);
       } finally {
         isSubmitting = false;
-        submitBtn.disabled = false;
+        execBtn.disabled = false;
       }
     }
 
-    function mapErrorMessage(reason, data) {
-      switch (reason) {
-        case 'customer_not_found':
-          return {
-            main: '会員情報が見つかりません',
-            sub: '会員番号をご確認ください'
-          };
-        case 'rank_not_allowed':
-          return {
-            main: '現在は入店できません',
-            sub: data && data.rank ? `ランク: ${data.rank}` : '会員状態をご確認ください'
-          };
-        case 'empty_customer_code':
-          return {
-            main: 'コードを読み取れませんでした',
-            sub: 'もう一度バーコードを読み取ってください'
-          };
-        default:
-          return {
-            main: '入店できませんでした',
-            sub: `理由: ${reason}`
-          };
-      }
-    }
-
-    submitBtn.addEventListener('click', () => {
-      submitCode(codeInput.value);
+    document.querySelectorAll('.mode-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        mode = btn.dataset.mode;
+        const u = new URL(location.href);
+        u.searchParams.set('mode', mode);
+        history.replaceState({}, '', u.toString());
+        refreshModeUI();
+      });
     });
 
-    codeInput.addEventListener('keydown', (event) => {
+    execBtn.addEventListener('click', executeAction);
+
+    clearBtn.addEventListener('click', () => {
+      customerCodeEl.value = '';
+      expiresAtEl.value = '';
+      noteEl.value = '';
+      rawResult.textContent = '結果がここに表示されます';
+      refreshModeUI();
+      customerCodeEl.focus();
+    });
+
+    customerCodeEl.addEventListener('input', () => {
+      customerCodeEl.value = normalizeCustomerCode(customerCodeEl.value);
+    });
+
+    customerCodeEl.addEventListener('keydown', (event) => {
       if (event.key === 'Enter') {
         event.preventDefault();
-        submitCode(codeInput.value);
+        executeAction();
       }
     });
 
-    codeInput.addEventListener('input', () => {
-      codeInput.value = normalizeCustomerCode(codeInput.value);
+    window.addEventListener('load', () => {
+      refreshModeUI();
+      customerCodeEl.focus();
     });
 
-    window.addEventListener('click', focusInput);
-    window.addEventListener('load', () => {
-      focusInput();
-      setStatus('idle', 'バーコードを読み取ってください', 'USBバーコードリーダーの入力を受け付けています');
+    window.addEventListener('click', () => {
+      if (!customerCodeEl.disabled) customerCodeEl.focus();
     });
   </script>
 </body>
