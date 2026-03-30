@@ -105,16 +105,16 @@
 <body>
   <div class="card">
     <div class="badge">COMPASSION WORLD</div>
-    <h1 id="title">会員証をかざしてください</h1>
-    <p id="desc">QRを読み取って処理を行います。</p>
+    <h1 id="title">会員証のバーコードをかざしてください</h1>
+    <p id="desc">バーコードを読み取って処理を行います。</p>
     <div class="mode" id="modeLabel"></div>
 
     <div id="reader"></div>
 
     <div class="status" id="statusBox">
       <strong>待機中</strong>
-      <div id="statusText">カメラに会員証のQRコードを向けてください。</div>
-      <div class="sub" id="statusSub"></div>
+      <div id="statusText">カメラに会員証のバーコードを向けてください。</div>
+      <div class="sub" id="statusSub">インカメラで起動します。</div>
     </div>
   </div>
 
@@ -128,20 +128,20 @@
     const modeMap = {
       entry: {
         label: "入店モード",
-        title: "会員証をかざしてください",
-        desc: "QRを読み取って入店確認を行います。",
+        title: "会員証のバーコードをかざしてください",
+        desc: "バーコードを読み取って入店確認を行います。",
         action: "entry_check"
       },
       upgrade: {
         label: "住民登録証に変更",
-        title: "会員証をかざしてください",
-        desc: "QRを読み取って住民登録証に変更します。",
+        title: "会員証のバーコードをかざしてください",
+        desc: "バーコードを読み取って住民登録証に変更します。",
         action: "upgrade"
       },
       downgrade: {
         label: "通行許可証に変更",
-        title: "会員証をかざしてください",
-        desc: "QRを読み取って通行許可証に変更します。",
+        title: "会員証のバーコードをかざしてください",
+        desc: "バーコードを読み取って通行許可証に変更します。",
         action: "downgrade"
       }
     };
@@ -239,28 +239,51 @@
       }
     }
 
-    const html5QrCode = new Html5Qrcode("reader");
+    async function startScanner() {
+      const html5QrCode = new Html5Qrcode("reader");
 
-    Html5Qrcode.getCameras().then(devices => {
-      if (!devices || !devices.length) {
-        setStatus("ng", "カメラが見つかりません", "端末のカメラ利用を確認してください。");
-        return;
+      try {
+        await html5QrCode.start(
+          { facingMode: "user" },
+          {
+            fps: 10,
+            qrbox: { width: 280, height: 120 },
+            formatsToSupport: [
+              Html5QrcodeSupportedFormats.CODE_39,
+              Html5QrcodeSupportedFormats.CODE_93,
+              Html5QrcodeSupportedFormats.CODE_128,
+              Html5QrcodeSupportedFormats.ITF
+            ]
+          },
+          (decodedText) => handleCode(decodedText),
+          () => {}
+        );
+        setStatus("", "待機中", "カメラに会員証のバーコードを向けてください。", "インカメラで起動しています。");
+      } catch (err) {
+        try {
+          await html5QrCode.start(
+            { facingMode: "environment" },
+            {
+              fps: 10,
+              qrbox: { width: 280, height: 120 },
+              formatsToSupport: [
+                Html5QrcodeSupportedFormats.CODE_39,
+                Html5QrcodeSupportedFormats.CODE_93,
+                Html5QrcodeSupportedFormats.CODE_128,
+                Html5QrcodeSupportedFormats.ITF
+              ]
+            },
+            (decodedText) => handleCode(decodedText),
+            () => {}
+          );
+          setStatus("", "待機中", "カメラに会員証のバーコードを向けてください。", "インカメラが使えなかったため、別カメラで起動しました。");
+        } catch (err2) {
+          setStatus("ng", "カメラを起動できません", String(err2), "");
+        }
       }
+    }
 
-      const backCamera = devices.find(d => /back|rear|environment/i.test(d.label));
-      const cameraId = (backCamera || devices[0]).id;
-
-      html5QrCode.start(
-        cameraId,
-        { fps: 10, qrbox: { width: 260, height: 260 } },
-        (decodedText) => handleCode(decodedText),
-        () => {}
-      ).catch(err => {
-        setStatus("ng", "カメラを起動できません", String(err), "");
-      });
-    }).catch(err => {
-      setStatus("ng", "カメラ取得エラー", String(err), "");
-    });
+    startScanner();
   </script>
 </body>
 </html>
