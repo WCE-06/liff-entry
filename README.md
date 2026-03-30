@@ -19,9 +19,9 @@
     <p id="sub">少々お待ちください。</p>
   </div>
 
-  <script>
-    const LIFF_ID = "2008818718-Mq4qlTTs";
-    const GAS_URL = "ここをGASのWebアプリURLに置き換える";
+<script>
+const LIFF_ID = "2008818718-Mq4qlTTs";
+const GAS_URL = "https://script.google.com/macros/s/AKfycbzRpeGbaQInZE0zkOg79oVX_FELSauEz77OJFjbYXmW0fgpIKq4hKLX-l4k3l09ZvBf/exec";
 
     async function main() {
       try {
