@@ -502,7 +502,7 @@
       progressShell.style.display = 'none';
       spinner.style.display = 'block';
 
-      messageMain.textContent = '確認できました。扉を開ける準備をしています。';
+      messageMain.textContent = '通行許可証をスキャンしました。会員情報を照会しています。';
       messageSub.textContent = '';
 
       const spinnerStarted = Date.now();
@@ -518,7 +518,7 @@
       if (result && result.ok) {
         successMark.style.display = 'flex';
         messageMain.textContent = '扉が開いたら、お足元に気をつけてお進みください。\nいらっしゃいませ。';
-        messageSub.textContent = result.name ? `${result.name} さんを確認しました。` : '';
+        messageSub.textContent = '';
         playSuccessSound();
         scheduleReset(20000);
       } else {
