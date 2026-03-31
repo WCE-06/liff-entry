@@ -7,16 +7,15 @@
   <style>
     :root {
       --bg: #f6f0e4;
-      --bg2: #fbf7ef;
       --panel: rgba(255, 252, 245, 0.92);
       --text: #5a4633;
       --muted: #8e7862;
       --line: rgba(138, 108, 78, 0.15);
       --accent: #d9c3a4;
       --accent-deep: #b99369;
-      --ok: #9fbe8b;
       --ok-deep: #6f9360;
       --shadow: 0 20px 40px rgba(122, 94, 64, 0.12);
+      --error: #b06652;
     }
 
     * {
@@ -230,7 +229,7 @@
     }
 
     .error-note {
-      color: #b06652;
+      color: var(--error);
     }
 
     @keyframes spin {
@@ -367,7 +366,7 @@
       messageSub.classList.remove('error-note');
     }
 
-    function scheduleReset(ms = 3500) {
+    function scheduleReset(ms) {
       if (resetTimer) clearTimeout(resetTimer);
       resetTimer = setTimeout(() => {
         codeInput.value = '';
@@ -441,13 +440,13 @@
     function mapErrorMessage(reason) {
       switch (reason) {
         case 'customer_not_found':
-          return '会員情報が見つかりませんでした。';
+          return 'うまく確認できませんでした。もう一度お試しください。';
         case 'rank_not_allowed':
-          return '現在は通行できない状態です。';
+          return 'うまく確認できませんでした。もう一度お試しください。';
         case 'empty_customer_code':
-          return '会員番号を確認できませんでした。';
+          return '通行許可証・住民登録証を読み取れませんでした。もう一度お試しください。';
         default:
-          return '確認中に問題が発生しました。';
+          return 'うまく確認できませんでした。もう一度お試しください。';
       }
     }
 
@@ -456,11 +455,11 @@
 
       if (!customerCode) {
         resetVisualState();
-        messageMain.textContent = '会員番号を確認できませんでした。';
-        messageSub.textContent = 'もう一度バーコードを読み取ってください。';
+        messageMain.textContent = '通行許可証・住民登録証を読み取れませんでした。もう一度お試しください。';
+        messageSub.textContent = '';
         messageSub.classList.add('error-note');
         playErrorSound();
-        scheduleReset(3500);
+        scheduleReset(10000);
         return;
       }
 
@@ -468,11 +467,11 @@
 
       if (isDuplicateRecently(customerCode)) {
         resetVisualState();
-        messageMain.textContent = '少し待ってからもう一度お試しください。';
-        messageSub.textContent = '連続読み取りを制限しています。';
+        messageMain.textContent = '確認が重なっているため、少し待ってからもう一度お試しください。';
+        messageSub.textContent = '';
         messageSub.classList.add('error-note');
         playErrorSound();
-        scheduleReset(2500);
+        scheduleReset(10000);
         return;
       }
 
@@ -518,17 +517,17 @@
 
       if (result && result.ok) {
         successMark.style.display = 'flex';
-        messageMain.textContent = '扉が開いたらお足元に注意して通行してください。\nいらっしゃいませ。';
+        messageMain.textContent = '扉が開いたら、お足元に気をつけてお進みください。\nいらっしゃいませ。';
         messageSub.textContent = result.name ? `${result.name} さんを確認しました。` : '';
         playSuccessSound();
-        scheduleReset(3600);
+        scheduleReset(20000);
       } else {
         resetVisualState();
         messageMain.textContent = mapErrorMessage(result && (result.reason || result.error));
-        messageSub.textContent = 'スタッフへお知らせください。';
+        messageSub.textContent = '';
         messageSub.classList.add('error-note');
         playErrorSound();
-        scheduleReset(3800);
+        scheduleReset(10000);
       }
     }
 
