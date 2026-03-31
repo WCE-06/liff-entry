@@ -2,272 +2,336 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>COMPASSION WORLD 会員処理テスト</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>COMPASSION WORLD 入店確認</title>
   <style>
     :root {
-      --bg: #0f172a;
-      --panel: #111827;
-      --text: #e5e7eb;
-      --muted: #94a3b8;
-      --accent: #38bdf8;
-      --ok: #22c55e;
-      --ng: #ef4444;
-      --busy: #f59e0b;
-      --border: rgba(255,255,255,0.08);
+      --bg: #f6f0e4;
+      --bg2: #fbf7ef;
+      --panel: rgba(255, 252, 245, 0.92);
+      --text: #5a4633;
+      --muted: #8e7862;
+      --line: rgba(138, 108, 78, 0.15);
+      --accent: #d9c3a4;
+      --accent-deep: #b99369;
+      --ok: #9fbe8b;
+      --ok-deep: #6f9360;
+      --shadow: 0 20px 40px rgba(122, 94, 64, 0.12);
     }
 
-    * { box-sizing: border-box; }
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      font-family: "Hiragino Sans", "Yu Gothic", "Noto Sans JP", system-ui, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top, #fff9f0 0%, var(--bg) 55%, #efe6d6 100%);
+    }
 
     body {
-      margin: 0;
       min-height: 100vh;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: radial-gradient(circle at top, #1e293b, var(--bg));
-      color: var(--text);
-      padding: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
     }
 
     .wrap {
-      max-width: 780px;
-      margin: 0 auto;
-      background: rgba(17,24,39,0.95);
-      border: 1px solid var(--border);
-      border-radius: 24px;
-      padding: 24px;
-      box-shadow: 0 30px 60px rgba(0,0,0,0.35);
+      width: 100%;
+      max-width: 760px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 30px;
+      box-shadow: var(--shadow);
+      padding: 30px 24px 26px;
+      backdrop-filter: blur(12px);
     }
 
-    h1 {
-      margin: 0 0 10px;
-      font-size: 30px;
+    .header {
       text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .title {
+      margin: 0;
+      font-size: 30px;
+      line-height: 1.3;
+      letter-spacing: 0.04em;
+      color: #6e533c;
+      font-weight: 800;
     }
 
     .sub {
-      text-align: center;
-      color: var(--muted);
-      margin-bottom: 22px;
-    }
-
-    .modes {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      margin-bottom: 18px;
-    }
-
-    .mode-btn {
-      border: 1px solid var(--border);
-      background: rgba(255,255,255,0.04);
-      color: var(--text);
-      border-radius: 999px;
-      padding: 10px 14px;
-      cursor: pointer;
-      font-weight: 700;
-    }
-
-    .mode-btn.active {
-      background: rgba(56,189,248,0.18);
-      border-color: rgba(56,189,248,0.35);
-    }
-
-    .card {
-      border: 1px solid var(--border);
-      border-radius: 18px;
-      padding: 20px;
-      background: rgba(255,255,255,0.02);
-    }
-
-    .status {
-      margin-bottom: 18px;
-      padding: 20px;
-      border-radius: 18px;
-      border: 1px solid var(--border);
-      min-height: 140px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      gap: 8px;
-    }
-
-    .status.idle {}
-    .status.busy { border-color: rgba(245,158,11,0.35); }
-    .status.ok { border-color: rgba(34,197,94,0.4); }
-    .status.ng { border-color: rgba(239,68,68,0.4); }
-
-    .badge {
-      display: inline-block;
-      align-self: center;
-      border-radius: 999px;
-      padding: 7px 12px;
-      font-size: 12px;
-      font-weight: 800;
-      background: rgba(56,189,248,0.18);
-    }
-
-    .status.busy .badge { background: rgba(245,158,11,0.2); }
-    .status.ok .badge { background: rgba(34,197,94,0.2); }
-    .status.ng .badge { background: rgba(239,68,68,0.2); }
-
-    .main {
-      text-align: center;
-      font-size: 30px;
-      font-weight: 800;
-      margin: 0;
-    }
-
-    .subtext {
-      text-align: center;
-      color: var(--muted);
-      margin: 0;
-      white-space: pre-wrap;
-      word-break: break-word;
-    }
-
-    .grid {
-      display: grid;
-      gap: 14px;
-    }
-
-    label {
-      display: grid;
-      gap: 6px;
+      margin: 10px 0 0;
       color: var(--muted);
       font-size: 14px;
     }
 
-    input {
-      height: 52px;
-      border-radius: 14px;
-      border: 1px solid var(--border);
-      background: rgba(255,255,255,0.04);
+    .card {
+      background: rgba(255,255,255,0.58);
+      border: 1px solid rgba(185, 147, 105, 0.16);
+      border-radius: 24px;
+      padding: 26px 20px;
+    }
+
+    .status {
+      min-height: 280px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .icon-area {
+      height: 70px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 18px;
+    }
+
+    .progress-shell {
+      width: 100%;
+      max-width: 420px;
+      margin: 0 auto;
+    }
+
+    .progress-track {
+      width: 100%;
+      height: 16px;
+      border-radius: 999px;
+      background: #eee1cf;
+      overflow: hidden;
+      position: relative;
+      box-shadow: inset 0 1px 3px rgba(122, 94, 64, 0.08);
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #dbc6aa 0%, #c8a57f 100%);
+      transition: width 0.12s linear;
+    }
+
+    .progress-num {
+      margin-top: 12px;
+      text-align: center;
+      font-size: 26px;
+      font-weight: 800;
+      color: #8a6746;
+      letter-spacing: 0.04em;
+    }
+
+    .spinner {
+      width: 54px;
+      height: 54px;
+      border-radius: 50%;
+      border: 5px solid rgba(185, 147, 105, 0.22);
+      border-top-color: var(--accent-deep);
+      animation: spin 0.85s linear infinite;
+      display: none;
+    }
+
+    .success-mark {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(circle at 35% 30%, #eff9e9, #dceccf);
+      box-shadow: inset 0 0 0 1px rgba(111, 147, 96, 0.18);
+    }
+
+    .success-mark svg {
+      width: 38px;
+      height: 38px;
+      stroke: var(--ok-deep);
+      stroke-width: 3.2;
+      fill: none;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .message-main {
+      margin: 0;
+      text-align: center;
+      font-size: 30px;
+      line-height: 1.6;
+      font-weight: 800;
+      color: #6c5037;
+      white-space: pre-line;
+    }
+
+    .message-sub {
+      margin: 14px 0 0;
+      text-align: center;
+      font-size: 16px;
+      line-height: 1.8;
+      color: var(--muted);
+      white-space: pre-line;
+      min-height: 1.8em;
+    }
+
+    .input-area {
+      margin-top: 22px;
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .code-input {
+      flex: 1;
+      min-width: 240px;
+      height: 56px;
+      border-radius: 16px;
+      border: 1px solid rgba(185, 147, 105, 0.22);
+      background: rgba(255,255,255,0.72);
       color: var(--text);
-      padding: 0 14px;
-      font-size: 18px;
+      font-size: 20px;
+      padding: 0 16px;
       outline: none;
     }
 
-    input:focus {
-      border-color: rgba(56,189,248,0.45);
-      box-shadow: 0 0 0 4px rgba(56,189,248,0.08);
+    .code-input:focus {
+      border-color: rgba(185, 147, 105, 0.48);
+      box-shadow: 0 0 0 4px rgba(217, 195, 164, 0.18);
     }
 
-    .actions {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      margin-top: 4px;
-    }
-
-    button.action {
-      height: 52px;
+    .btn {
+      height: 56px;
       border: none;
-      border-radius: 14px;
-      padding: 0 18px;
-      cursor: pointer;
+      border-radius: 16px;
+      padding: 0 20px;
+      background: linear-gradient(180deg, #e4ceb0 0%, #d5b490 100%);
+      color: #65492f;
       font-size: 16px;
       font-weight: 800;
-      background: var(--accent);
-      color: #082f49;
+      cursor: pointer;
+      box-shadow: 0 8px 20px rgba(185, 147, 105, 0.18);
     }
 
-    button.subtle {
-      background: rgba(255,255,255,0.08);
-      color: var(--text);
-      border: 1px solid var(--border);
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      box-shadow: none;
     }
 
-    .raw {
+    .footer {
       margin-top: 16px;
-      padding: 14px;
-      border-radius: 14px;
-      background: rgba(0,0,0,0.25);
-      color: #cbd5e1;
-      font-size: 13px;
-      overflow: auto;
-      white-space: pre-wrap;
-      word-break: break-word;
-    }
-
-    .note {
-      margin-top: 14px;
+      text-align: center;
       color: var(--muted);
       font-size: 13px;
-      text-align: center;
+    }
+
+    .error-note {
+      color: #b06652;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    @media (max-width: 640px) {
+      .wrap {
+        padding: 22px 16px 18px;
+        border-radius: 24px;
+      }
+
+      .title {
+        font-size: 24px;
+      }
+
+      .message-main {
+        font-size: 23px;
+      }
+
+      .message-sub {
+        font-size: 15px;
+      }
+
+      .input-area {
+        flex-direction: column;
+      }
+
+      .btn, .code-input {
+        width: 100%;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <h1>COMPASSION WORLD</h1>
-    <div class="sub">GitHub Pages から入店・ランク変更・同期をテスト</div>
+  <main class="wrap">
+    <header class="header">
+      <h1 class="title">COMPASSION WORLD</h1>
+      <p class="sub">会員証のバーコードを読み取ってください</p>
+    </header>
 
-    <div class="modes">
-      <button class="mode-btn" data-mode="entry">entry</button>
-      <button class="mode-btn" data-mode="upgrade">upgrade</button>
-      <button class="mode-btn" data-mode="downgrade">downgrade</button>
-      <button class="mode-btn" data-mode="sync_all">sync_all</button>
-    </div>
+    <section class="card">
+      <div class="status">
+        <div class="icon-area">
+          <div id="spinner" class="spinner" aria-hidden="true"></div>
 
-    <div id="statusBox" class="status idle">
-      <div id="badge" class="badge">待機中</div>
-      <p id="mainText" class="main">操作を選んでください</p>
-      <p id="subText" class="subtext">バーコード読み取りまたはボタン操作でテストできます</p>
-    </div>
+          <div id="successMark" class="success-mark" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <path d="M5 12.5l4.2 4.2L19 7.5"></path>
+            </svg>
+          </div>
+        </div>
 
-    <div class="card">
-      <div class="grid">
-        <label>
-          会員番号
-          <input id="customerCode" type="text" placeholder="例: 650A0DB2F6" autocomplete="off" />
-        </label>
+        <p id="messageMain" class="message-main">通行許可証・住民登録証を確認しています。</p>
+        <p id="messageSub" class="message-sub"></p>
 
-        <label id="expiresWrap">
-          expiresAt
-          <input id="expiresAt" type="text" placeholder="例: 2026-12-31" autocomplete="off" />
-        </label>
-
-        <label id="noteWrap">
-          note
-          <input id="note" type="text" placeholder="任意" autocomplete="off" />
-        </label>
+        <div id="progressShell" class="progress-shell">
+          <div class="progress-track">
+            <div id="progressFill" class="progress-fill"></div>
+          </div>
+          <div id="progressNum" class="progress-num">0%</div>
+        </div>
       </div>
 
-      <div class="actions">
-        <button id="execBtn" class="action">実行</button>
-        <button id="clearBtn" class="action subtle">クリア</button>
+      <div class="input-area">
+        <input
+          id="codeInput"
+          class="code-input"
+          type="text"
+          inputmode="text"
+          autocomplete="off"
+          autocapitalize="characters"
+          spellcheck="false"
+          placeholder="会員番号を入力、またはバーコードを読み取り"
+        />
+        <button id="submitBtn" class="btn" type="button">確認する</button>
       </div>
 
-      <pre id="rawResult" class="raw">結果がここに表示されます</pre>
-    </div>
-
-    <div class="note">
-      entry は USBバーコードリーダーの Enter 確定にも対応しています
-    </div>
-  </div>
+      <div class="footer">
+        USBバーコードリーダーの Enter 確定に対応しています
+      </div>
+    </section>
+  </main>
 
   <script>
     const WORKER_URL = 'https://compassion-world-proxy.combetter27.workers.dev/';
-    const params = new URLSearchParams(location.search);
+    const codeInput = document.getElementById('codeInput');
+    const submitBtn = document.getElementById('submitBtn');
 
-    const customerCodeEl = document.getElementById('customerCode');
-    const expiresAtEl = document.getElementById('expiresAt');
-    const noteEl = document.getElementById('note');
-    const execBtn = document.getElementById('execBtn');
-    const clearBtn = document.getElementById('clearBtn');
-    const rawResult = document.getElementById('rawResult');
-    const statusBox = document.getElementById('statusBox');
-    const badge = document.getElementById('badge');
-    const mainText = document.getElementById('mainText');
-    const subText = document.getElementById('subText');
-    const expiresWrap = document.getElementById('expiresWrap');
-    const noteWrap = document.getElementById('noteWrap');
+    const messageMain = document.getElementById('messageMain');
+    const messageSub = document.getElementById('messageSub');
+    const progressShell = document.getElementById('progressShell');
+    const progressFill = document.getElementById('progressFill');
+    const progressNum = document.getElementById('progressNum');
+    const spinner = document.getElementById('spinner');
+    const successMark = document.getElementById('successMark');
 
-    let mode = params.get('mode') || 'entry';
     let isSubmitting = false;
     let lastSubmittedCode = '';
     let lastSubmittedAt = 0;
+    let resetTimer = null;
 
     function normalizeCustomerCode(value) {
       return String(value || '')
@@ -278,167 +342,218 @@
         .toUpperCase();
     }
 
-    function setStatus(type, main, sub) {
-      statusBox.className = `status ${type}`;
-      badge.textContent =
-        type === 'busy' ? '処理中' :
-        type === 'ok' ? '成功' :
-        type === 'ng' ? '失敗' :
-        '待機中';
-      mainText.textContent = main;
-      subText.textContent = sub || '';
+    function randomMs(min, max) {
+      return Math.floor(Math.random() * (max - min + 1)) + min;
     }
 
-    function refreshModeUI() {
-      document.querySelectorAll('.mode-btn').forEach(btn => {
-        btn.classList.toggle('active', btn.dataset.mode === mode);
-      });
-
-      expiresWrap.style.display = mode === 'upgrade' ? 'grid' : 'none';
-      noteWrap.style.display = (mode === 'upgrade' || mode === 'downgrade') ? 'grid' : 'none';
-
-      if (mode === 'sync_all') {
-        customerCodeEl.disabled = true;
-        expiresAtEl.disabled = true;
-        noteEl.disabled = true;
-        customerCodeEl.value = '';
-      } else {
-        customerCodeEl.disabled = false;
-        expiresAtEl.disabled = mode !== 'upgrade';
-        noteEl.disabled = !(mode === 'upgrade' || mode === 'downgrade');
-      }
-
-      if (mode === 'entry') {
-        setStatus('idle', 'バーコードを読み取ってください', 'USBバーコードリーダーの入力を受け付けています');
-      } else if (mode === 'upgrade') {
-        setStatus('idle', 'ランクアップを実行します', '会員番号を入力して実行してください');
-      } else if (mode === 'downgrade') {
-        setStatus('idle', 'ランクダウンを実行します', '会員番号を入力して実行してください');
-      } else {
-        setStatus('idle', '全件同期を実行します', '実行ボタンで同期できます');
-      }
+    function sleep(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
     }
 
-    function showRaw(data) {
-      rawResult.textContent = JSON.stringify(data, null, 2);
+    function focusInput() {
+      codeInput.focus({ preventScroll: true });
+    }
+
+    function resetVisualState() {
+      progressShell.style.display = '';
+      progressFill.style.width = '0%';
+      progressNum.textContent = '0%';
+
+      spinner.style.display = 'none';
+      successMark.style.display = 'none';
+
+      messageMain.textContent = '通行許可証・住民登録証を確認しています。';
+      messageSub.textContent = '';
+      messageSub.classList.remove('error-note');
+    }
+
+    function scheduleReset(ms = 3500) {
+      if (resetTimer) clearTimeout(resetTimer);
+      resetTimer = setTimeout(() => {
+        codeInput.value = '';
+        resetVisualState();
+        isSubmitting = false;
+        submitBtn.disabled = false;
+        focusInput();
+      }, ms);
+    }
+
+    function playTone(freq, duration, gainValue = 0.035) {
+      try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+
+        osc.type = 'sine';
+        osc.frequency.value = freq;
+        gain.gain.value = gainValue;
+
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        osc.start();
+
+        setTimeout(() => {
+          osc.stop();
+          ctx.close();
+        }, duration);
+      } catch (e) {}
+    }
+
+    function playSuccessSound() {
+      playTone(784, 120);
+      setTimeout(() => playTone(1046, 150), 130);
+    }
+
+    function playErrorSound() {
+      playTone(280, 170, 0.03);
+      setTimeout(() => playTone(230, 190, 0.03), 180);
     }
 
     function isDuplicateRecently(code) {
       const now = Date.now();
-      return code &&
-        code === lastSubmittedCode &&
-        (now - lastSubmittedAt) < 2000;
+      return code && code === lastSubmittedCode && (now - lastSubmittedAt) < 2000;
     }
 
-    async function executeAction() {
-      if (isSubmitting) return;
+    async function animateProgress(durationMs) {
+      return new Promise(resolve => {
+        const started = performance.now();
 
-      const customerCode = normalizeCustomerCode(customerCodeEl.value);
-      const expiresAt = String(expiresAtEl.value || '').trim();
-      const note = String(noteEl.value || '').trim();
+        function tick(now) {
+          const elapsed = now - started;
+          const ratio = Math.min(elapsed / durationMs, 1);
+          const percent = Math.round(ratio * 100);
 
-      if (mode !== 'sync_all' && !customerCode) {
-        setStatus('ng', '会員番号が未入力です', 'customerCode を確認してください');
+          progressFill.style.width = `${percent}%`;
+          progressNum.textContent = `${percent}%`;
+
+          if (ratio < 1) {
+            requestAnimationFrame(tick);
+          } else {
+            resolve();
+          }
+        }
+
+        requestAnimationFrame(tick);
+      });
+    }
+
+    function mapErrorMessage(reason) {
+      switch (reason) {
+        case 'customer_not_found':
+          return '会員情報が見つかりませんでした。';
+        case 'rank_not_allowed':
+          return '現在は通行できない状態です。';
+        case 'empty_customer_code':
+          return '会員番号を確認できませんでした。';
+        default:
+          return '確認中に問題が発生しました。';
+      }
+    }
+
+    async function submitCode(rawCode) {
+      const customerCode = normalizeCustomerCode(rawCode);
+
+      if (!customerCode) {
+        resetVisualState();
+        messageMain.textContent = '会員番号を確認できませんでした。';
+        messageSub.textContent = 'もう一度バーコードを読み取ってください。';
+        messageSub.classList.add('error-note');
+        playErrorSound();
+        scheduleReset(3500);
         return;
       }
 
-      if (mode === 'entry' && isDuplicateRecently(customerCode)) {
-        setStatus('ng', '連続読み取りを制限中です', '少し待ってから再実行してください');
+      if (isSubmitting) return;
+
+      if (isDuplicateRecently(customerCode)) {
+        resetVisualState();
+        messageMain.textContent = '少し待ってからもう一度お試しください。';
+        messageSub.textContent = '連続読み取りを制限しています。';
+        messageSub.classList.add('error-note');
+        playErrorSound();
+        scheduleReset(2500);
         return;
       }
 
       isSubmitting = true;
-      execBtn.disabled = true;
+      submitBtn.disabled = true;
       lastSubmittedCode = customerCode;
       lastSubmittedAt = Date.now();
 
-      setStatus('busy', '処理中です', `${mode} を実行しています...`);
+      resetVisualState();
 
-      try {
-        let response;
-        if (mode === 'entry') {
-          response = await fetch(WORKER_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              action: 'entry_check',
-              customerCode
-            })
-          });
-        } else {
-          const url = new URL(WORKER_URL);
-          url.searchParams.set('action', mode);
-          if (customerCode) url.searchParams.set('customerCode', customerCode);
-          if (expiresAt) url.searchParams.set('expiresAt', expiresAt);
-          if (note) url.searchParams.set('note', note);
-          response = await fetch(url.toString(), { method: 'GET' });
-        }
+      const progressDuration = randomMs(1500, 2500);
+      const spinnerMinDuration = randomMs(1500, 3000);
 
-        const data = await response.json().catch(() => ({ ok: false, error: 'invalid_json' }));
-        showRaw(data);
+      const requestPromise = fetch(WORKER_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'entry_check', customerCode })
+      }).then(async res => {
+        const data = await res.json().catch(() => ({ ok: false, error: 'invalid_json' }));
+        return data;
+      }).catch(err => ({
+        ok: false,
+        error: String(err && err.message ? err.message : err)
+      }));
 
-        if (data.ok) {
-          if (mode === 'entry') {
-            setStatus('ok', 'どうぞお入りください', data.name ? `${data.name} さんを確認しました` : '会員確認が完了しました');
-          } else if (mode === 'upgrade') {
-            setStatus('ok', 'ランクアップしました', customerCode || '完了');
-          } else if (mode === 'downgrade') {
-            setStatus('ok', 'ランクダウンしました', customerCode || '完了');
-          } else {
-            setStatus('ok', '同期が完了しました', data.synced ? `synced=${data.synced}` : '完了');
-          }
-        } else {
-          setStatus('ng', '処理に失敗しました', data.error || data.reason || 'unknown_error');
-        }
-      } catch (err) {
-        const data = { ok: false, error: String(err && err.message ? err.message : err) };
-        showRaw(data);
-        setStatus('ng', '通信に失敗しました', data.error);
-      } finally {
-        isSubmitting = false;
-        execBtn.disabled = false;
+      await animateProgress(progressDuration);
+
+      progressShell.style.display = 'none';
+      spinner.style.display = 'block';
+
+      messageMain.textContent = '確認できました。扉を開ける準備をしています。';
+      messageSub.textContent = '';
+
+      const spinnerStarted = Date.now();
+      const result = await requestPromise;
+      const spinnerElapsed = Date.now() - spinnerStarted;
+
+      if (spinnerElapsed < spinnerMinDuration) {
+        await sleep(spinnerMinDuration - spinnerElapsed);
+      }
+
+      spinner.style.display = 'none';
+
+      if (result && result.ok) {
+        successMark.style.display = 'flex';
+        messageMain.textContent = '扉が開いたらお足元に注意して通行してください。\nいらっしゃいませ。';
+        messageSub.textContent = result.name ? `${result.name} さんを確認しました。` : '';
+        playSuccessSound();
+        scheduleReset(3600);
+      } else {
+        resetVisualState();
+        messageMain.textContent = mapErrorMessage(result && (result.reason || result.error));
+        messageSub.textContent = 'スタッフへお知らせください。';
+        messageSub.classList.add('error-note');
+        playErrorSound();
+        scheduleReset(3800);
       }
     }
 
-    document.querySelectorAll('.mode-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        mode = btn.dataset.mode;
-        const u = new URL(location.href);
-        u.searchParams.set('mode', mode);
-        history.replaceState({}, '', u.toString());
-        refreshModeUI();
-      });
+    submitBtn.addEventListener('click', () => {
+      submitCode(codeInput.value);
     });
 
-    execBtn.addEventListener('click', executeAction);
-
-    clearBtn.addEventListener('click', () => {
-      customerCodeEl.value = '';
-      expiresAtEl.value = '';
-      noteEl.value = '';
-      rawResult.textContent = '結果がここに表示されます';
-      refreshModeUI();
-      customerCodeEl.focus();
-    });
-
-    customerCodeEl.addEventListener('input', () => {
-      customerCodeEl.value = normalizeCustomerCode(customerCodeEl.value);
-    });
-
-    customerCodeEl.addEventListener('keydown', (event) => {
+    codeInput.addEventListener('keydown', (event) => {
       if (event.key === 'Enter') {
         event.preventDefault();
-        executeAction();
+        submitCode(codeInput.value);
       }
     });
 
+    codeInput.addEventListener('input', () => {
+      codeInput.value = normalizeCustomerCode(codeInput.value);
+    });
+
     window.addEventListener('load', () => {
-      refreshModeUI();
-      customerCodeEl.focus();
+      resetVisualState();
+      focusInput();
     });
 
     window.addEventListener('click', () => {
-      if (!customerCodeEl.disabled) customerCodeEl.focus();
+      if (!isSubmitting) focusInput();
     });
   </script>
 </body>
