@@ -268,7 +268,7 @@
   <main class="wrap">
     <header class="header">
       <h1 class="title">COMPASSION WORLD</h1>
-      <p class="sub">会員証のバーコードを読み取ってください</p>
+      <p class="sub">右側のバーコードリーダーに読み取らせてください</p>
     </header>
 
     <section class="card">
@@ -283,7 +283,7 @@
           </div>
         </div>
 
-        <p id="messageMain" class="message-main">通行許可証・住民登録証を確認しています。</p>
+        <p id="messageMain" class="message-main">通行許可証・住民登録証をスキャンしてください。</p>
         <p id="messageSub" class="message-sub"></p>
 
         <div id="progressShell" class="progress-shell">
@@ -502,7 +502,7 @@
       progressShell.style.display = 'none';
       spinner.style.display = 'block';
 
-      messageMain.textContent = '通行許可証をスキャンしました。会員情報を照会しています。';
+      messageMain.textContent = '通行許可証・住民登録証をスキャンしました。お客さま情報を照会しています。';
       messageSub.textContent = '';
 
       const spinnerStarted = Date.now();
@@ -517,7 +517,7 @@
 
       if (result && result.ok) {
         successMark.style.display = 'flex';
-        messageMain.textContent = '扉が開いたら、お足元に気をつけてお進みください。\nいらっしゃいませ。';
+        messageMain.textContent = '扉が開きます。お足元に気をつけてお進みください。\nいらっしゃいませ。';
         messageSub.textContent = '';
         playSuccessSound();
         scheduleReset(20000);
