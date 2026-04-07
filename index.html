@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>COMPASSION WORLD 入店確認</title>
+  <title>COMPASSION WORLD　本館 チェックイン</title>
   <style>
     :root {
       --bg: #f6f0e4;
@@ -303,13 +303,13 @@
           autocomplete="off"
           autocapitalize="characters"
           spellcheck="false"
-          placeholder="会員番号を入力、またはバーコードを読み取り"
+          placeholder="バーコードをスキャンしてください"
         />
-        <button id="submitBtn" class="btn" type="button">確認する</button>
+        <button id="submitBtn" class="btn" type="button">確定</button>
       </div>
 
       <div class="footer">
-        USBバーコードリーダーの Enter 確定に対応しています
+        お客さま名簿は最新の状態です。
       </div>
     </section>
   </main>
@@ -361,7 +361,7 @@
       spinner.style.display = 'none';
       successMark.style.display = 'none';
 
-      messageMain.textContent = '通行許可証・住民登録証を確認しています。';
+      messageMain.textContent = '通行許可証・住民登録証をスキャンしてください。';
       messageSub.textContent = '';
       messageSub.classList.remove('error-note');
     }
