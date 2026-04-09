@@ -316,6 +316,8 @@
 
   <script>
     const WORKER_URL = 'https://compassion-world-proxy.combetter27.workers.dev/';
+    const POINT_GAS_URL = 'https://script.google.com/macros/s/AKfycbwWdVJo6yC6RL3IjJcjueePaIpyo-H7Mh5TGUSqvYEMyZk3Lup8Hcf-JZgsXa-fQB85SA/exec';
+
     const codeInput = document.getElementById('codeInput');
     const submitBtn = document.getElementById('submitBtn');
 
@@ -468,6 +470,28 @@
       }
     }
 
+    async function postCheckinPoint(customerCode) {
+      try {
+        const res = await fetch(POINT_GAS_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'checkin_point',
+            customerCode,
+            source: 'door_html'
+          })
+        });
+
+        const data = await res.json().catch(() => ({ ok: false, error: 'invalid_json' }));
+        return data;
+      } catch (err) {
+        return {
+          ok: false,
+          error: String(err && err.message ? err.message : err)
+        };
+      }
+    }
+
     async function submitCode(rawCode) {
       const customerCode = normalizeCustomerCode(rawCode);
 
@@ -537,6 +561,8 @@
       spinner.style.display = 'none';
 
       if (firstSuccess) {
+        postCheckinPoint(customerCode).catch(() => {});
+
         successMark.style.display = 'flex';
         messageMain.textContent = '扉が開きます。お足元にお気をつけください。';
         messageSub.textContent = '';
