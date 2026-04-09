@@ -450,6 +450,24 @@
       }
     }
 
+    async function postEntryCheck(customerCode) {
+      try {
+        const res = await fetch(WORKER_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'entry_check', customerCode })
+        });
+
+        const data = await res.json().catch(() => ({ ok: false, error: 'invalid_json' }));
+        return data;
+      } catch (err) {
+        return {
+          ok: false,
+          error: String(err && err.message ? err.message : err)
+        };
+      }
+    }
+
     async function submitCode(rawCode) {
       const customerCode = normalizeCustomerCode(rawCode);
 
@@ -485,18 +503,6 @@
       const progressDuration = randomMs(1500, 2500);
       const spinnerMinDuration = randomMs(1500, 3000);
 
-      const requestPromise = fetch(WORKER_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'entry_check', customerCode })
-      }).then(async res => {
-        const data = await res.json().catch(() => ({ ok: false, error: 'invalid_json' }));
-        return data;
-      }).catch(err => ({
-        ok: false,
-        error: String(err && err.message ? err.message : err)
-      }));
-
       await animateProgress(progressDuration);
 
       progressShell.style.display = 'none';
@@ -506,24 +512,55 @@
       messageSub.textContent = '';
 
       const spinnerStarted = Date.now();
-      const result = await requestPromise;
-      const spinnerElapsed = Date.now() - spinnerStarted;
 
+      let firstSuccess = null;
+      let lastResult = null;
+
+      for (let i = 0; i < 3; i++) {
+        const result = await postEntryCheck(customerCode);
+        lastResult = result;
+
+        if (result && result.ok && !firstSuccess) {
+          firstSuccess = result;
+        }
+
+        if (i < 2) {
+          await sleep(2000);
+        }
+      }
+
+      const spinnerElapsed = Date.now() - spinnerStarted;
       if (spinnerElapsed < spinnerMinDuration) {
         await sleep(spinnerMinDuration - spinnerElapsed);
       }
 
       spinner.style.display = 'none';
 
-      if (result && result.ok) {
+      if (firstSuccess) {
         successMark.style.display = 'flex';
-        messageMain.textContent = '扉が開きます。お足元に気をつけてお進みください。\nいらっしゃいませ。';
+        messageMain.textContent = '扉が開きます。お足元にお気をつけください。';
         messageSub.textContent = '';
+        messageSub.classList.remove('error-note');
         playSuccessSound();
-        scheduleReset(20000);
+
+        await sleep(10000);
+
+        successMark.style.display = 'none';
+        messageMain.textContent = 'エラーが発生しました。\n誠に恐れ入りますが、もう一度、最初からやり直してください。';
+        messageSub.textContent = '';
+        messageSub.classList.add('error-note');
+        playErrorSound();
+
+        await sleep(8000);
+
+        codeInput.value = '';
+        resetVisualState();
+        isSubmitting = false;
+        submitBtn.disabled = false;
+        focusInput();
       } else {
         resetVisualState();
-        messageMain.textContent = mapErrorMessage(result && (result.reason || result.error));
+        messageMain.textContent = mapErrorMessage(lastResult && (lastResult.reason || lastResult.error));
         messageSub.textContent = '';
         messageSub.classList.add('error-note');
         playErrorSound();
