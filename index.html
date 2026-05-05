@@ -322,6 +322,22 @@
     const BGM_URL = 'https://wce-06.github.io/liff-entry/audio/bgm.mp3';
     const ENTRANCE_AUDIO_URL = 'https://wce-06.github.io/liff-entry/audio/entrance.mp3';
 
+    const VOLUME = {
+      day: {
+        bgm: 0.28,
+        guide: 0.60,
+        guideIdle: 0.03
+      },
+      night: {
+        bgm: 0.14,
+        guide: 0.30,
+        guideIdle: 0.02
+      }
+    };
+
+    const GUIDE_DURATION_MS = 11000;
+    const GUIDE_BGM_DUCKING_RATE = 0.65;
+
     const codeInput = document.getElementById('codeInput');
     const submitBtn = document.getElementById('submitBtn');
     const audioStartBtn = document.getElementById('audioStartBtn');
@@ -343,6 +359,8 @@
     let bgmAudio = null;
     let entranceAudio = null;
     let audioReady = false;
+    let isGuideLoud = false;
+    let guideResetTimer = null;
 
     function normalizeCustomerCode(value) {
       return String(value || '')
@@ -361,40 +379,34 @@
       codeInput.focus({ preventScroll: true });
     }
 
-    function getBgmVolumeByTime() {
-      const now = new Date();
-      const hour = now.getHours();
-
-      if (hour >= 8 && hour < 22) return 0.18;
-      if (hour >= 22 || hour < 2) return 0.09;
-      return 0.04;
+    function getVolumeSet() {
+      const hour = new Date().getHours();
+      return hour >= 21 ? VOLUME.night : VOLUME.day;
     }
 
     function initAudio() {
       bgmAudio = new Audio(BGM_URL);
       bgmAudio.loop = true;
       bgmAudio.preload = 'auto';
-      bgmAudio.volume = getBgmVolumeByTime();
+      bgmAudio.volume = getVolumeSet().bgm;
 
       entranceAudio = new Audio(ENTRANCE_AUDIO_URL);
-      entranceAudio.loop = false;
+      entranceAudio.loop = true;
       entranceAudio.preload = 'auto';
-      entranceAudio.volume = 1.0;
+      entranceAudio.volume = getVolumeSet().guideIdle;
     }
 
-    async function startBgm() {
+    async function startAudio() {
       if (!bgmAudio || !entranceAudio) initAudio();
 
       try {
-        bgmAudio.volume = getBgmVolumeByTime();
-        await bgmAudio.play();
+        const v = getVolumeSet();
 
-        entranceAudio.volume = 0.01;
-        entranceAudio.currentTime = 0;
+        bgmAudio.volume = v.bgm;
+        entranceAudio.volume = v.guideIdle;
+
+        await bgmAudio.play();
         await entranceAudio.play();
-        entranceAudio.pause();
-        entranceAudio.currentTime = 0;
-        entranceAudio.volume = 1.0;
 
         audioReady = true;
         audioStartBtn.classList.add('ready');
@@ -406,33 +418,40 @@
       }
     }
 
-    function updateBgmVolume() {
-      if (!bgmAudio || !audioReady) return;
-      bgmAudio.volume = getBgmVolumeByTime();
+    function updateAudioVolumes() {
+      if (!bgmAudio || !entranceAudio || !audioReady) return;
+
+      const v = getVolumeSet();
+
+      if (isGuideLoud) {
+        bgmAudio.volume = v.bgm * GUIDE_BGM_DUCKING_RATE;
+        entranceAudio.volume = v.guide;
+      } else {
+        bgmAudio.volume = v.bgm;
+        entranceAudio.volume = v.guideIdle;
+      }
     }
 
-    async function playEntranceAnnouncement() {
-      if (!audioReady || !entranceAudio || !bgmAudio) return;
+    function playEntranceAnnouncement() {
+      if (!audioReady || !bgmAudio || !entranceAudio) return;
 
-      const baseVolume = getBgmVolumeByTime();
-      bgmAudio.volume = Math.min(baseVolume, 0.03);
+      const v = getVolumeSet();
+
+      isGuideLoud = true;
+
+      if (guideResetTimer) clearTimeout(guideResetTimer);
 
       try {
-        entranceAudio.pause();
         entranceAudio.currentTime = 0;
-        entranceAudio.volume = 1.0;
-        await entranceAudio.play();
+      } catch (err) {}
 
-        entranceAudio.onended = () => {
-          if (bgmAudio && audioReady) {
-            bgmAudio.volume = getBgmVolumeByTime();
-          }
-        };
-      } catch (err) {
-        if (bgmAudio && audioReady) {
-          bgmAudio.volume = getBgmVolumeByTime();
-        }
-      }
+      bgmAudio.volume = v.bgm * GUIDE_BGM_DUCKING_RATE;
+      entranceAudio.volume = v.guide;
+
+      guideResetTimer = setTimeout(() => {
+        isGuideLoud = false;
+        updateAudioVolumes();
+      }, GUIDE_DURATION_MS);
     }
 
     function resetVisualState() {
@@ -706,14 +725,14 @@
     });
 
     audioStartBtn.addEventListener('click', () => {
-      startBgm();
+      startAudio();
     });
 
     window.addEventListener('load', () => {
       initAudio();
       resetVisualState();
       focusInput();
-      setInterval(updateBgmVolume, 60000);
+      setInterval(updateAudioVolumes, 60000);
     });
 
     window.addEventListener('click', () => {
