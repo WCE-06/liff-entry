@@ -11,7 +11,6 @@
       --text: #5a4633;
       --muted: #8e7862;
       --line: rgba(138, 108, 78, 0.15);
-      --accent: #d9c3a4;
       --accent-deep: #b99369;
       --ok-deep: #6f9360;
       --shadow: 0 20px 40px rgba(122, 94, 64, 0.12);
@@ -389,6 +388,14 @@
       try {
         bgmAudio.volume = getBgmVolumeByTime();
         await bgmAudio.play();
+
+        entranceAudio.volume = 0.01;
+        entranceAudio.currentTime = 0;
+        await entranceAudio.play();
+        entranceAudio.pause();
+        entranceAudio.currentTime = 0;
+        entranceAudio.volume = 1.0;
+
         audioReady = true;
         audioStartBtn.classList.add('ready');
         focusInput();
@@ -413,6 +420,7 @@
       try {
         entranceAudio.pause();
         entranceAudio.currentTime = 0;
+        entranceAudio.volume = 1.0;
         await entranceAudio.play();
 
         entranceAudio.onended = () => {
@@ -585,8 +593,6 @@
       messageSub.classList.remove('error-note');
 
       playSuccessSound();
-      playEntranceAnnouncement();
-
       postCheckinPoint(customerCode).catch(() => {});
       runBackgroundDoorRetries(customerCode).catch(() => {});
       scheduleReset(20000);
@@ -648,6 +654,8 @@
       messageMain.textContent = '通行許可証・住民登録証をスキャンしました。\nお客さま情報を照会しています。';
       messageSub.textContent = '確認が完了しましたら、\nゲートが自動で開きます。';
 
+      playEntranceAnnouncement();
+
       const stopProgress = startProgressAnimation();
 
       const firstResult = await postEntryCheck(customerCode);
@@ -705,7 +713,6 @@
       initAudio();
       resetVisualState();
       focusInput();
-
       setInterval(updateBgmVolume, 60000);
     });
 
