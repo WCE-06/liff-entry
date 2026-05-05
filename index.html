@@ -335,7 +335,8 @@
       }
     };
 
-    const GUIDE_DURATION_MS = 21000;
+    const GUIDE_PLAY_DURATION_MS = 21000;
+    const GUIDE_COOLDOWN_MS = 3000;
     const GUIDE_BGM_DUCKING_RATE = 0.65;
 
     const codeInput = document.getElementById('codeInput');
@@ -360,7 +361,9 @@
     let entranceAudio = null;
     let audioReady = false;
     let isGuideLoud = false;
-    let guideResetTimer = null;
+    let isGuideCoolingDown = false;
+    let guidePlayTimer = null;
+    let guideCooldownTimer = null;
 
     function normalizeCustomerCode(value) {
       return String(value || '')
@@ -426,20 +429,34 @@
       if (isGuideLoud) {
         bgmAudio.volume = v.bgm * GUIDE_BGM_DUCKING_RATE;
         entranceAudio.volume = v.guide;
-      } else {
-        bgmAudio.volume = v.bgm;
-        entranceAudio.volume = v.guideIdle;
+        return;
+      }
+
+      bgmAudio.volume = v.bgm;
+      entranceAudio.volume = v.guideIdle;
+    }
+
+    function clearGuideTimers() {
+      if (guidePlayTimer) {
+        clearTimeout(guidePlayTimer);
+        guidePlayTimer = null;
+      }
+
+      if (guideCooldownTimer) {
+        clearTimeout(guideCooldownTimer);
+        guideCooldownTimer = null;
       }
     }
 
     function playEntranceAnnouncement() {
       if (!audioReady || !bgmAudio || !entranceAudio) return;
 
+      clearGuideTimers();
+
       const v = getVolumeSet();
 
       isGuideLoud = true;
-
-      if (guideResetTimer) clearTimeout(guideResetTimer);
+      isGuideCoolingDown = false;
 
       try {
         entranceAudio.currentTime = 0;
@@ -448,10 +465,18 @@
       bgmAudio.volume = v.bgm * GUIDE_BGM_DUCKING_RATE;
       entranceAudio.volume = v.guide;
 
-      guideResetTimer = setTimeout(() => {
+      guidePlayTimer = setTimeout(() => {
         isGuideLoud = false;
-        updateAudioVolumes();
-      }, GUIDE_DURATION_MS);
+        isGuideCoolingDown = true;
+
+        entranceAudio.volume = v.guideIdle;
+        bgmAudio.volume = getVolumeSet().bgm;
+
+        guideCooldownTimer = setTimeout(() => {
+          isGuideCoolingDown = false;
+          updateAudioVolumes();
+        }, GUIDE_COOLDOWN_MS);
+      }, GUIDE_PLAY_DURATION_MS);
     }
 
     function resetVisualState() {
