@@ -1,303 +1,592 @@
-<script>
-  const WORKER_URL = 'https://compassion-world-proxy.combetter27.workers.dev/';
-  const POINT_GAS_URL = 'https://script.google.com/macros/s/AKfycbwWdVJo6yC6RL3IjJcjueePaIpyo-H7Mh5TGUSqvYEMyZk3Lup8Hcf-JZgsXa-fQB85SA/exec';
-  const ENTRANCE_AUDIO_URL = 'https://wce-06.github.io/liff-entry/audio/entrance.mp3';
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>COMPASSION WORLD 本館 チェックイン</title>
+  <style>
+    :root {
+      --bg: #f6f0e4;
+      --panel: rgba(255, 252, 245, 0.92);
+      --text: #5a4633;
+      --muted: #8e7862;
+      --line: rgba(138, 108, 78, 0.15);
+      --accent: #d9c3a4;
+      --accent-deep: #b99369;
+      --ok-deep: #6f9360;
+      --shadow: 0 20px 40px rgba(122, 94, 64, 0.12);
+      --error: #b06652;
+    }
 
-  const codeInput = document.getElementById('codeInput');
-  const submitBtn = document.getElementById('submitBtn');
+    * { box-sizing: border-box; }
 
-  const messageMain = document.getElementById('messageMain');
-  const messageSub = document.getElementById('messageSub');
-  const progressShell = document.getElementById('progressShell');
-  const progressFill = document.getElementById('progressFill');
-  const progressNum = document.getElementById('progressNum');
-  const spinner = document.getElementById('spinner');
-  const successMark = document.getElementById('successMark');
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      font-family: "Hiragino Sans", "Yu Gothic", "Noto Sans JP", system-ui, sans-serif;
+      color: var(--text);
+      background: radial-gradient(circle at top, #fff9f0 0%, var(--bg) 55%, #efe6d6 100%);
+    }
 
-  let isSubmitting = false;
-  let lastSubmittedCode = '';
-  let lastSubmittedAt = 0;
-  let resetTimer = null;
-  let entranceAudio = null;
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
 
-  function normalizeCustomerCode(value) {
-    return String(value || '')
-      .trim()
-      .replace(/\r/g, '')
-      .replace(/\n/g, '')
-      .replace(/\s+/g, '')
-      .toUpperCase();
-  }
+    .wrap {
+      width: 100%;
+      max-width: 760px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 30px;
+      box-shadow: var(--shadow);
+      padding: 30px 24px 26px;
+      backdrop-filter: blur(12px);
+    }
 
-  function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-  }
+    .header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
 
-  function focusInput() {
-    codeInput.focus({ preventScroll: true });
-  }
+    .title {
+      margin: 0;
+      font-size: 30px;
+      line-height: 1.3;
+      letter-spacing: 0.04em;
+      color: #6e533c;
+      font-weight: 800;
+    }
 
-  function initEntranceAudio() {
-    entranceAudio = new Audio(ENTRANCE_AUDIO_URL);
-    entranceAudio.preload = 'auto';
-    entranceAudio.volume = 1.0;
-  }
+    .sub {
+      margin: 10px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
 
-  function playEntranceAudio() {
-    if (!entranceAudio) initEntranceAudio();
-    entranceAudio.currentTime = 0;
-    entranceAudio.play().catch(() => {});
-  }
+    .card {
+      background: rgba(255,255,255,0.58);
+      border: 1px solid rgba(185, 147, 105, 0.16);
+      border-radius: 24px;
+      padding: 26px 20px;
+    }
 
-  function resetVisualState() {
-    progressShell.style.display = '';
-    progressFill.style.width = '0%';
-    progressNum.textContent = '0%';
+    .status {
+      min-height: 280px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
 
-    spinner.style.display = 'none';
-    successMark.style.display = 'none';
+    .icon-area {
+      height: 70px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 18px;
+    }
 
-    messageMain.textContent = '通行許可証・住民登録証を\nスキャンしてください。';
-    messageSub.textContent = '';
-    messageSub.classList.remove('error-note');
-  }
+    .progress-shell {
+      width: 100%;
+      max-width: 420px;
+      margin: 0 auto;
+    }
 
-  function scheduleReset(ms) {
-    if (resetTimer) clearTimeout(resetTimer);
-    resetTimer = setTimeout(() => {
-      codeInput.value = '';
-      resetVisualState();
-      isSubmitting = false;
-      submitBtn.disabled = false;
-      focusInput();
-    }, ms);
-  }
+    .progress-track {
+      width: 100%;
+      height: 16px;
+      border-radius: 999px;
+      background: #eee1cf;
+      overflow: hidden;
+      box-shadow: inset 0 1px 3px rgba(122, 94, 64, 0.08);
+    }
 
-  function playTone(freq, duration, gainValue = 0.035) {
-    try {
-      const ctx = new (window.AudioContext || window.webkitAudioContext)();
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #dbc6aa 0%, #c8a57f 100%);
+      transition: width 0.12s linear;
+    }
 
-      osc.type = 'sine';
-      osc.frequency.value = freq;
-      gain.gain.value = gainValue;
+    .progress-num {
+      margin-top: 12px;
+      text-align: center;
+      font-size: 26px;
+      font-weight: 800;
+      color: #8a6746;
+      letter-spacing: 0.04em;
+    }
 
-      osc.connect(gain);
-      gain.connect(ctx.destination);
+    .spinner {
+      width: 54px;
+      height: 54px;
+      border-radius: 50%;
+      border: 5px solid rgba(185, 147, 105, 0.22);
+      border-top-color: var(--accent-deep);
+      animation: spin 0.85s linear infinite;
+      display: none;
+    }
 
-      osc.start();
+    .success-mark {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(circle at 35% 30%, #eff9e9, #dceccf);
+      box-shadow: inset 0 0 0 1px rgba(111, 147, 96, 0.18);
+    }
 
-      setTimeout(() => {
-        osc.stop();
-        ctx.close();
-      }, duration);
-    } catch (e) {}
-  }
+    .success-mark svg {
+      width: 38px;
+      height: 38px;
+      stroke: var(--ok-deep);
+      stroke-width: 3.2;
+      fill: none;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
 
-  function playSuccessSound() {
-    playTone(784, 120);
-    setTimeout(() => playTone(1046, 150), 130);
-  }
+    .message-main {
+      margin: 0;
+      text-align: center;
+      font-size: 30px;
+      line-height: 1.6;
+      font-weight: 800;
+      color: #6c5037;
+      white-space: pre-line;
+    }
 
-  function playErrorSound() {
-    playTone(280, 170, 0.03);
-    setTimeout(() => playTone(230, 190, 0.03), 180);
-  }
+    .message-sub {
+      margin: 14px 0 0;
+      text-align: center;
+      font-size: 16px;
+      line-height: 1.8;
+      color: var(--muted);
+      white-space: pre-line;
+      min-height: 1.8em;
+    }
 
-  function isDuplicateRecently(code) {
-    const now = Date.now();
-    return code && code === lastSubmittedCode && (now - lastSubmittedAt) < 2000;
-  }
+    .input-area {
+      margin-top: 22px;
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
 
-  function startProgressAnimation() {
-    let percent = 0;
-    progressFill.style.width = '0%';
-    progressNum.textContent = '0%';
+    .code-input {
+      flex: 1;
+      min-width: 240px;
+      height: 56px;
+      border-radius: 16px;
+      border: 1px solid rgba(185, 147, 105, 0.22);
+      background: rgba(255,255,255,0.72);
+      color: var(--text);
+      font-size: 20px;
+      padding: 0 16px;
+      outline: none;
+    }
 
-    const timer = setInterval(() => {
-      percent = Math.min(percent + 4, 96);
-      progressFill.style.width = `${percent}%`;
-      progressNum.textContent = `${percent}%`;
-    }, 80);
+    .code-input:focus {
+      border-color: rgba(185, 147, 105, 0.48);
+      box-shadow: 0 0 0 4px rgba(217, 195, 164, 0.18);
+    }
 
-    return function stopProgress(complete) {
-      clearInterval(timer);
-      if (complete) {
-        progressFill.style.width = '100%';
-        progressNum.textContent = '100%';
+    .btn {
+      height: 56px;
+      border: none;
+      border-radius: 16px;
+      padding: 0 20px;
+      background: linear-gradient(180deg, #e4ceb0 0%, #d5b490 100%);
+      color: #65492f;
+      font-size: 16px;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 8px 20px rgba(185, 147, 105, 0.18);
+    }
+
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    .footer {
+      margin-top: 16px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .error-note { color: var(--error); }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    @media (max-width: 640px) {
+      .wrap {
+        padding: 22px 16px 18px;
+        border-radius: 24px;
       }
-    };
-  }
 
-  function mapErrorMessage(reason) {
-    switch (reason) {
-      case 'empty_customer_code':
-        return '通行許可証・住民登録証を読み取れませんでした。\nもう一度お試しください。';
-      default:
-        return 'うまく確認できませんでした。\nもう一度お試しください。';
+      .title { font-size: 24px; }
+      .message-main { font-size: 23px; }
+      .message-sub { font-size: 15px; }
+
+      .input-area { flex-direction: column; }
+      .btn, .code-input { width: 100%; }
     }
-  }
+  </style>
+</head>
 
-  async function postEntryCheck(customerCode) {
-    try {
-      const res = await fetch(WORKER_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'entry_check', customerCode })
-      });
+<body>
+  <main class="wrap">
+    <header class="header">
+      <h1 class="title">COMPASSION WORLD</h1>
+      <p class="sub">右側のバーコードリーダーに読み取らせてください</p>
+    </header>
 
-      return await res.json().catch(() => ({ ok: false, error: 'invalid_json' }));
-    } catch (err) {
-      return {
-        ok: false,
-        error: String(err && err.message ? err.message : err)
-      };
+    <section class="card">
+      <div class="status">
+        <div class="icon-area">
+          <div id="spinner" class="spinner" aria-hidden="true"></div>
+
+          <div id="successMark" class="success-mark" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <path d="M5 12.5l4.2 4.2L19 7.5"></path>
+            </svg>
+          </div>
+        </div>
+
+        <p id="messageMain" class="message-main">通行許可証・住民登録証を
+スキャンしてください。</p>
+        <p id="messageSub" class="message-sub"></p>
+
+        <div id="progressShell" class="progress-shell">
+          <div class="progress-track">
+            <div id="progressFill" class="progress-fill"></div>
+          </div>
+          <div id="progressNum" class="progress-num">0%</div>
+        </div>
+      </div>
+
+      <div class="input-area">
+        <input
+          id="codeInput"
+          class="code-input"
+          type="text"
+          inputmode="text"
+          autocomplete="off"
+          autocapitalize="characters"
+          spellcheck="false"
+          placeholder="バーコードをスキャンしてください"
+        />
+        <button id="submitBtn" class="btn" type="button">確定</button>
+      </div>
+
+      <div class="footer">
+        お客さま名簿は最新の状態です。
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const WORKER_URL = 'https://compassion-world-proxy.combetter27.workers.dev/';
+    const POINT_GAS_URL = 'https://script.google.com/macros/s/AKfycbwWdVJo6yC6RL3IjJcjueePaIpyo-H7Mh5TGUSqvYEMyZk3Lup8Hcf-JZgsXa-fQB85SA/exec';
+    const ENTRANCE_AUDIO_URL = 'https://wce-06.github.io/liff-entry/audio/entrance.mp3';
+
+    const codeInput = document.getElementById('codeInput');
+    const submitBtn = document.getElementById('submitBtn');
+    const messageMain = document.getElementById('messageMain');
+    const messageSub = document.getElementById('messageSub');
+    const progressShell = document.getElementById('progressShell');
+    const progressFill = document.getElementById('progressFill');
+    const progressNum = document.getElementById('progressNum');
+    const spinner = document.getElementById('spinner');
+    const successMark = document.getElementById('successMark');
+
+    let isSubmitting = false;
+    let lastSubmittedCode = '';
+    let lastSubmittedAt = 0;
+    let resetTimer = null;
+    let entranceAudio = null;
+
+    function normalizeCustomerCode(value) {
+      return String(value || '')
+        .trim()
+        .replace(/\r/g, '')
+        .replace(/\n/g, '')
+        .replace(/\s+/g, '')
+        .toUpperCase();
     }
-  }
 
-  async function postCheckinPoint(customerCode) {
-    try {
-      const res = await fetch(POINT_GAS_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'checkin_point',
-          customerCode,
-          source: 'door_html'
-        })
-      });
-
-      return await res.json().catch(() => ({ ok: false, error: 'invalid_json' }));
-    } catch (err) {
-      return {
-        ok: false,
-        error: String(err && err.message ? err.message : err)
-      };
-    }
-  }
-
-  async function runBackgroundDoorRetries(customerCode) {
-    await sleep(2000);
-    postEntryCheck(customerCode).catch(() => {});
-    await sleep(2000);
-    postEntryCheck(customerCode).catch(() => {});
-  }
-
-  function showSuccess(customerCode) {
-    progressShell.style.display = 'none';
-    spinner.style.display = 'none';
-    successMark.style.display = 'flex';
-
-    messageMain.textContent = 'ゲートが開きます。\nお足元に気をつけてお進みください。';
-    messageSub.textContent = 'COMPASSION WORLDでのひとときを、どうぞごゆっくりお過ごしください。';
-    messageSub.classList.remove('error-note');
-
-    playSuccessSound();
-    postCheckinPoint(customerCode).catch(() => {});
-    runBackgroundDoorRetries(customerCode).catch(() => {});
-    scheduleReset(20000);
-  }
-
-  function showError(reason) {
-    resetVisualState();
-
-    messageMain.textContent = mapErrorMessage(reason);
-    messageSub.textContent = '再試行してもゲートが開かない場合、\n公式LINEのカブメニューから、\nヘルプチャットにてお問い合わせください。';
-    messageSub.classList.add('error-note');
-
-    playErrorSound();
-    scheduleReset(10000);
-  }
-
-  async function submitCode(rawCode) {
-    const customerCode = normalizeCustomerCode(rawCode);
-
-    if (!customerCode) {
-      showError('empty_customer_code');
-      return;
+    function sleep(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
     }
 
-    if (isSubmitting) return;
+    function focusInput() {
+      codeInput.focus({ preventScroll: true });
+    }
 
-    if (isDuplicateRecently(customerCode)) {
-      resetVisualState();
-      messageMain.textContent = '確認が重なっているため、\n少し待ってからもう一度お試しください。';
+    function initEntranceAudio() {
+      entranceAudio = new Audio(ENTRANCE_AUDIO_URL);
+      entranceAudio.preload = 'auto';
+      entranceAudio.volume = 1.0;
+    }
+
+    function playEntranceAudio() {
+      if (!entranceAudio) initEntranceAudio();
+      entranceAudio.currentTime = 0;
+      entranceAudio.play().catch(() => {});
+    }
+
+    function resetVisualState() {
+      progressShell.style.display = '';
+      progressFill.style.width = '0%';
+      progressNum.textContent = '0%';
+
+      spinner.style.display = 'none';
+      successMark.style.display = 'none';
+
+      messageMain.textContent = '通行許可証・住民登録証を\nスキャンしてください。';
       messageSub.textContent = '';
+      messageSub.classList.remove('error-note');
+    }
+
+    function scheduleReset(ms) {
+      if (resetTimer) clearTimeout(resetTimer);
+      resetTimer = setTimeout(() => {
+        codeInput.value = '';
+        resetVisualState();
+        isSubmitting = false;
+        submitBtn.disabled = false;
+        focusInput();
+      }, ms);
+    }
+
+    function playTone(freq, duration, gainValue = 0.035) {
+      try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+
+        osc.type = 'sine';
+        osc.frequency.value = freq;
+        gain.gain.value = gainValue;
+
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+
+        setTimeout(() => {
+          osc.stop();
+          ctx.close();
+        }, duration);
+      } catch (e) {}
+    }
+
+    function playSuccessSound() {
+      playTone(784, 120);
+      setTimeout(() => playTone(1046, 150), 130);
+    }
+
+    function playErrorSound() {
+      playTone(280, 170, 0.03);
+      setTimeout(() => playTone(230, 190, 0.03), 180);
+    }
+
+    function isDuplicateRecently(code) {
+      const now = Date.now();
+      return code && code === lastSubmittedCode && (now - lastSubmittedAt) < 2000;
+    }
+
+    function startProgressAnimation() {
+      let percent = 0;
+      progressFill.style.width = '0%';
+      progressNum.textContent = '0%';
+
+      const timer = setInterval(() => {
+        percent = Math.min(percent + 4, 96);
+        progressFill.style.width = percent + '%';
+        progressNum.textContent = percent + '%';
+      }, 80);
+
+      return function stopProgress(complete) {
+        clearInterval(timer);
+        if (complete) {
+          progressFill.style.width = '100%';
+          progressNum.textContent = '100%';
+        }
+      };
+    }
+
+    function mapErrorMessage(reason) {
+      if (reason === 'empty_customer_code') {
+        return '通行許可証・住民登録証を読み取れませんでした。\nもう一度お試しください。';
+      }
+      return 'うまく確認できませんでした。\nもう一度お試しください。';
+    }
+
+    async function postEntryCheck(customerCode) {
+      try {
+        const res = await fetch(WORKER_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'entry_check', customerCode })
+        });
+
+        return await res.json().catch(() => ({ ok: false, error: 'invalid_json' }));
+      } catch (err) {
+        return { ok: false, error: String(err && err.message ? err.message : err) };
+      }
+    }
+
+    async function postCheckinPoint(customerCode) {
+      try {
+        const res = await fetch(POINT_GAS_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'checkin_point',
+            customerCode,
+            source: 'door_html'
+          })
+        });
+
+        return await res.json().catch(() => ({ ok: false, error: 'invalid_json' }));
+      } catch (err) {
+        return { ok: false, error: String(err && err.message ? err.message : err) };
+      }
+    }
+
+    async function runBackgroundDoorRetries(customerCode) {
+      await sleep(2000);
+      postEntryCheck(customerCode).catch(() => {});
+      await sleep(2000);
+      postEntryCheck(customerCode).catch(() => {});
+    }
+
+    function showSuccess(customerCode) {
+      progressShell.style.display = 'none';
+      spinner.style.display = 'none';
+      successMark.style.display = 'flex';
+
+      messageMain.textContent = 'ゲートが開きます。\nお足元に気をつけてお進みください。';
+      messageSub.textContent = 'COMPASSION WORLDでのひとときを、\nどうぞごゆっくりお過ごしください。';
+      messageSub.classList.remove('error-note');
+
+      playSuccessSound();
+      postCheckinPoint(customerCode).catch(() => {});
+      runBackgroundDoorRetries(customerCode).catch(() => {});
+      scheduleReset(20000);
+    }
+
+    function showError(reason) {
+      resetVisualState();
+
+      messageMain.textContent = mapErrorMessage(reason);
+      messageSub.textContent = '再試行してもゲートが開かない場合、\n公式LINEのリッチメニューから、\nヘルプチャットにてお問い合わせください。';
       messageSub.classList.add('error-note');
+
       playErrorSound();
       scheduleReset(10000);
-      return;
     }
 
-    isSubmitting = true;
-    submitBtn.disabled = true;
-    lastSubmittedCode = customerCode;
-    lastSubmittedAt = Date.now();
+    async function submitCode(rawCode) {
+      const customerCode = normalizeCustomerCode(rawCode);
 
-    playEntranceAudio();
+      if (!customerCode) {
+        showError('empty_customer_code');
+        return;
+      }
 
-    resetVisualState();
+      if (isSubmitting) return;
 
-    messageMain.textContent = '通行許可証・住民登録証をスキャンしました。\nお客さま情報を照会しています。';
-    messageSub.textContent = '確認が完了しましたら、ゲートが自動で開きます。';
+      if (isDuplicateRecently(customerCode)) {
+        resetVisualState();
+        messageMain.textContent = '確認が重なっているため、\n少し待ってからもう一度お試しください。';
+        messageSub.textContent = '';
+        messageSub.classList.add('error-note');
+        playErrorSound();
+        scheduleReset(10000);
+        return;
+      }
 
-    const stopProgress = startProgressAnimation();
+      isSubmitting = true;
+      submitBtn.disabled = true;
+      lastSubmittedCode = customerCode;
+      lastSubmittedAt = Date.now();
 
-    const firstResult = await postEntryCheck(customerCode);
+      playEntranceAudio();
 
-    if (firstResult && firstResult.ok) {
-      stopProgress(true);
-      await sleep(250);
-      showSuccess(customerCode);
-      return;
+      resetVisualState();
+
+      messageMain.textContent = '通行許可証・住民登録証をスキャンしました。\nお客さま情報を照会しています。';
+      messageSub.textContent = '確認が完了しましたら、\nゲートが自動で開きます。';
+
+      const stopProgress = startProgressAnimation();
+
+      const firstResult = await postEntryCheck(customerCode);
+
+      if (firstResult && firstResult.ok) {
+        stopProgress(true);
+        await sleep(250);
+        showSuccess(customerCode);
+        return;
+      }
+
+      progressShell.style.display = 'none';
+      spinner.style.display = 'block';
+
+      const secondResult = await postEntryCheck(customerCode);
+
+      if (secondResult && secondResult.ok) {
+        showSuccess(customerCode);
+        return;
+      }
+
+      await sleep(1000);
+
+      const thirdResult = await postEntryCheck(customerCode);
+
+      if (thirdResult && thirdResult.ok) {
+        showSuccess(customerCode);
+        return;
+      }
+
+      spinner.style.display = 'none';
+      showError(thirdResult && (thirdResult.reason || thirdResult.error));
     }
 
-    progressShell.style.display = 'none';
-    spinner.style.display = 'block';
-
-    const secondResult = await postEntryCheck(customerCode);
-
-    if (secondResult && secondResult.ok) {
-      showSuccess(customerCode);
-      return;
-    }
-
-    await sleep(1000);
-
-    const thirdResult = await postEntryCheck(customerCode);
-
-    if (thirdResult && thirdResult.ok) {
-      showSuccess(customerCode);
-      return;
-    }
-
-    spinner.style.display = 'none';
-    showError(thirdResult && (thirdResult.reason || thirdResult.error));
-  }
-
-  submitBtn.addEventListener('click', () => {
-    submitCode(codeInput.value);
-  });
-
-  codeInput.addEventListener('keydown', (event) => {
-    if (event.key === 'Enter') {
-      event.preventDefault();
+    submitBtn.addEventListener('click', () => {
       submitCode(codeInput.value);
-    }
-  });
+    });
 
-  codeInput.addEventListener('input', () => {
-    codeInput.value = normalizeCustomerCode(codeInput.value);
-  });
+    codeInput.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        submitCode(codeInput.value);
+      }
+    });
 
-  window.addEventListener('load', () => {
-    initEntranceAudio();
-    resetVisualState();
-    focusInput();
-  });
+    codeInput.addEventListener('input', () => {
+      codeInput.value = normalizeCustomerCode(codeInput.value);
+    });
 
-  window.addEventListener('click', () => {
-    if (!isSubmitting) focusInput();
-  });
-</script>
+    window.addEventListener('load', () => {
+      initEntranceAudio();
+      resetVisualState();
+      focusInput();
+    });
+
+    window.addEventListener('click', () => {
+      if (!isSubmitting) focusInput();
+    });
+  </script>
+</body>
+</html>
