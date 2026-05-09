@@ -316,23 +316,15 @@
   </main>
 
   <script>
-    const WORKER_URL = 'https://compassion-world-proxy.combetter27.workers.dev/';
+    const WORKER_URL = 'https://script.google.com/macros/s/AKfycbzWlGKM3xvwUhZbKcT2NPJBreNEPWzW-W-giNrihVS-WBoBAhpN92A4OXW-aVltutVTjg/exec';
     const POINT_GAS_URL = 'https://script.google.com/macros/s/AKfycbwWdVJo6yC6RL3IjJcjueePaIpyo-H7Mh5TGUSqvYEMyZk3Lup8Hcf-JZgsXa-fQB85SA/exec';
 
     const BGM_URL = 'https://wce-06.github.io/liff-entry/audio/bgm.mp3';
     const ENTRANCE_AUDIO_URL = 'https://wce-06.github.io/liff-entry/audio/entrance.mp3';
 
     const VOLUME = {
-      day: {
-        bgm: 0.28,
-        guide: 0.60,
-        guideIdle: 0.01
-      },
-      night: {
-        bgm: 0.14,
-        guide: 0.30,
-        guideIdle: 0.01
-      }
+      day: { bgm: 0.28, guide: 0.60, guideIdle: 0.01 },
+      night: { bgm: 0.14, guide: 0.30, guideIdle: 0.01 }
     };
 
     const GUIDE_PLAY_DURATION_MS = 20500;
@@ -580,6 +572,15 @@
       if (reason === 'empty_customer_code') {
         return '通行許可証・住民登録証を読み取れませんでした。\nもう一度お試しください。';
       }
+      if (reason === 'customer_not_found') {
+        return '会員情報を確認できませんでした。\n公式LINEの会員登録をご確認ください。';
+      }
+      if (reason === 'rank_not_allowed') {
+        return '通行許可証・住民登録証を確認できませんでした。\n会員情報をご確認ください。';
+      }
+      if (reason === 'Failed to fetch') {
+        return '通信に失敗しました。\n少し時間をあけてもう一度お試しください。';
+      }
       return 'うまく確認できませんでした。\nもう一度お試しください。';
     }
 
@@ -587,7 +588,7 @@
       try {
         const res = await fetch(WORKER_URL, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
           body: JSON.stringify({ action: 'entry_check', customerCode })
         });
 
@@ -601,7 +602,7 @@
       try {
         const res = await fetch(POINT_GAS_URL, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
           body: JSON.stringify({
             action: 'checkin_point',
             customerCode,
