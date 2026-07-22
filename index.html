@@ -2,8 +2,12 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+  />
   <title>COMPASSION WORLD 本館 チェックイン</title>
+
   <style>
     :root {
       --bg: #f6f0e4;
@@ -17,14 +21,28 @@
       --error: #b06652;
     }
 
-    * { box-sizing: border-box; }
+    * {
+      box-sizing: border-box;
+    }
 
-    html, body {
+    html,
+    body {
       margin: 0;
       min-height: 100%;
-      font-family: "Hiragino Sans", "Yu Gothic", "Noto Sans JP", system-ui, sans-serif;
+      font-family:
+        "Hiragino Sans",
+        "Yu Gothic",
+        "Noto Sans JP",
+        system-ui,
+        sans-serif;
       color: var(--text);
-      background: radial-gradient(circle at top, #fff9f0 0%, var(--bg) 55%, #efe6d6 100%);
+      background:
+        radial-gradient(
+          circle at top,
+          #fff9f0 0%,
+          var(--bg) 55%,
+          #efe6d6 100%
+        );
     }
 
     body {
@@ -67,7 +85,7 @@
     }
 
     .card {
-      background: rgba(255,255,255,0.58);
+      background: rgba(255, 255, 255, 0.58);
       border: 1px solid rgba(185, 147, 105, 0.16);
       border-radius: 24px;
       padding: 26px 20px;
@@ -108,7 +126,12 @@
       height: 100%;
       width: 0%;
       border-radius: 999px;
-      background: linear-gradient(90deg, #dbc6aa 0%, #c8a57f 100%);
+      background:
+        linear-gradient(
+          90deg,
+          #dbc6aa 0%,
+          #c8a57f 100%
+        );
       transition: width 0.12s linear;
     }
 
@@ -138,8 +161,14 @@
       display: none;
       align-items: center;
       justify-content: center;
-      background: radial-gradient(circle at 35% 30%, #eff9e9, #dceccf);
-      box-shadow: inset 0 0 0 1px rgba(111, 147, 96, 0.18);
+      background:
+        radial-gradient(
+          circle at 35% 30%,
+          #eff9e9,
+          #dceccf
+        );
+      box-shadow:
+        inset 0 0 0 1px rgba(111, 147, 96, 0.18);
     }
 
     .success-mark svg {
@@ -185,7 +214,7 @@
       height: 56px;
       border-radius: 16px;
       border: 1px solid rgba(185, 147, 105, 0.22);
-      background: rgba(255,255,255,0.72);
+      background: rgba(255, 255, 255, 0.72);
       color: var(--text);
       font-size: 20px;
       padding: 0 16px;
@@ -194,7 +223,8 @@
 
     .code-input:focus {
       border-color: rgba(185, 147, 105, 0.48);
-      box-shadow: 0 0 0 4px rgba(217, 195, 164, 0.18);
+      box-shadow:
+        0 0 0 4px rgba(217, 195, 164, 0.18);
     }
 
     .btn {
@@ -202,12 +232,18 @@
       border: none;
       border-radius: 16px;
       padding: 0 20px;
-      background: linear-gradient(180deg, #e4ceb0 0%, #d5b490 100%);
+      background:
+        linear-gradient(
+          180deg,
+          #e4ceb0 0%,
+          #d5b490 100%
+        );
       color: #65492f;
       font-size: 16px;
       font-weight: 800;
       cursor: pointer;
-      box-shadow: 0 8px 20px rgba(185, 147, 105, 0.18);
+      box-shadow:
+        0 8px 20px rgba(185, 147, 105, 0.18);
     }
 
     .btn:disabled {
@@ -222,7 +258,7 @@
       height: 48px;
       border: 1px solid rgba(185, 147, 105, 0.28);
       border-radius: 16px;
-      background: rgba(255,255,255,0.7);
+      background: rgba(255, 255, 255, 0.7);
       color: #65492f;
       font-size: 14px;
       font-weight: 800;
@@ -240,9 +276,15 @@
       font-size: 13px;
     }
 
-    .error-note { color: var(--error); }
+    .error-note {
+      color: var(--error);
+    }
 
-    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
 
     @media (max-width: 640px) {
       .wrap {
@@ -250,12 +292,26 @@
         border-radius: 24px;
       }
 
-      .title { font-size: 24px; }
-      .message-main { font-size: 23px; }
-      .message-sub { font-size: 15px; }
+      .title {
+        font-size: 24px;
+      }
 
-      .input-area { flex-direction: column; }
-      .btn, .code-input { width: 100%; }
+      .message-main {
+        font-size: 23px;
+      }
+
+      .message-sub {
+        font-size: 15px;
+      }
+
+      .input-area {
+        flex-direction: column;
+      }
+
+      .btn,
+      .code-input {
+        width: 100%;
+      }
     }
   </style>
 </head>
@@ -264,30 +320,59 @@
   <main class="wrap">
     <header class="header">
       <h1 class="title">COMPASSION WORLD</h1>
-      <p class="sub">右側のバーコードリーダーに読み取らせてください</p>
+      <p class="sub">
+        右側のバーコードリーダーに読み取らせてください
+      </p>
     </header>
 
     <section class="card">
       <div class="status">
         <div class="icon-area">
-          <div id="spinner" class="spinner" aria-hidden="true"></div>
+          <div
+            id="spinner"
+            class="spinner"
+            aria-hidden="true"
+          ></div>
 
-          <div id="successMark" class="success-mark" aria-hidden="true">
+          <div
+            id="successMark"
+            class="success-mark"
+            aria-hidden="true"
+          >
             <svg viewBox="0 0 24 24">
               <path d="M5 12.5l4.2 4.2L19 7.5"></path>
             </svg>
           </div>
         </div>
 
-        <p id="messageMain" class="message-main">通行許可証・住民登録証を
+        <p
+          id="messageMain"
+          class="message-main"
+        >通行許可証・住民登録証を
 スキャンしてください。</p>
-        <p id="messageSub" class="message-sub"></p>
 
-        <div id="progressShell" class="progress-shell">
+        <p
+          id="messageSub"
+          class="message-sub"
+        ></p>
+
+        <div
+          id="progressShell"
+          class="progress-shell"
+        >
           <div class="progress-track">
-            <div id="progressFill" class="progress-fill"></div>
+            <div
+              id="progressFill"
+              class="progress-fill"
+            ></div>
           </div>
-          <div id="progressNum" class="progress-num">0%</div>
+
+          <div
+            id="progressNum"
+            class="progress-num"
+          >
+            0%
+          </div>
         </div>
       </div>
 
@@ -302,10 +387,21 @@
           spellcheck="false"
           placeholder="バーコードをスキャンしてください"
         />
-        <button id="submitBtn" class="btn" type="button">確定</button>
+
+        <button
+          id="submitBtn"
+          class="btn"
+          type="button"
+        >
+          確定
+        </button>
       </div>
 
-      <button id="audioStartBtn" class="audio-btn" type="button">
+      <button
+        id="audioStartBtn"
+        class="audio-btn"
+        type="button"
+      >
         音声案内を有効にする
       </button>
 
@@ -316,32 +412,70 @@
   </main>
 
   <script>
-    const WORKER_URL = 'https://script.google.com/macros/s/AKfycbzWlGKM3xvwUhZbKcT2NPJBreNEPWzW-W-giNrihVS-WBoBAhpN92A4OXW-aVltutVTjg/exec';
-    const POINT_GAS_URL = 'https://script.google.com/macros/s/AKfycbwWdVJo6yC6RL3IjJcjueePaIpyo-H7Mh5TGUSqvYEMyZk3Lup8Hcf-JZgsXa-fQB85SA/exec';
+    const WORKER_URL =
+      'https://script.google.com/macros/s/AKfycbzWlGKM3xvwUhZbKcT2NPJBreNEPWzW-W-giNrihVS-WBoBAhpN92A4OXW-aVltutVTjg/exec';
 
-    const BGM_URL = 'https://wce-06.github.io/liff-entry/audio/bgm.mp3';
-    const ENTRANCE_AUDIO_URL = 'https://wce-06.github.io/liff-entry/audio/entrance.mp3';
+    const POINT_GAS_URL =
+      'https://script.google.com/macros/s/AKfycbwWdVJo6yC6RL3IjJcjueePaIpyo-H7Mh5TGUSqvYEMyZk3Lup8Hcf-JZgsXa-fQB85SA/exec';
+
+    const BGM_URL =
+      'https://wce-06.github.io/liff-entry/audio/bgm.mp3';
+
+    const ENTRANCE_AUDIO_URL =
+      'https://wce-06.github.io/liff-entry/audio/entrance.mp3';
 
     const VOLUME = {
-      day: { bgm: 0.28, guide: 0.60, guideIdle: 0.01 },
-      night: { bgm: 0.14, guide: 0.30, guideIdle: 0.01 }
+      day: {
+        bgm: 0.28,
+        guide: 0.60,
+        guideIdle: 0.01
+      },
+      night: {
+        bgm: 0.14,
+        guide: 0.30,
+        guideIdle: 0.01
+      }
     };
 
     const GUIDE_PLAY_DURATION_MS = 20500;
     const GUIDE_COOLDOWN_MS = 3000;
     const GUIDE_BGM_DUCKING_RATE = 0.65;
 
-    const codeInput = document.getElementById('codeInput');
-    const submitBtn = document.getElementById('submitBtn');
-    const audioStartBtn = document.getElementById('audioStartBtn');
+    /*
+     * 通信エラー時に再試行するまでの待ち時間。
+     * 通常の認証成功・会員情報不一致時には再試行しません。
+     */
+    const NETWORK_RETRY_DELAY_MS = 1000;
 
-    const messageMain = document.getElementById('messageMain');
-    const messageSub = document.getElementById('messageSub');
-    const progressShell = document.getElementById('progressShell');
-    const progressFill = document.getElementById('progressFill');
-    const progressNum = document.getElementById('progressNum');
-    const spinner = document.getElementById('spinner');
-    const successMark = document.getElementById('successMark');
+    const codeInput =
+      document.getElementById('codeInput');
+
+    const submitBtn =
+      document.getElementById('submitBtn');
+
+    const audioStartBtn =
+      document.getElementById('audioStartBtn');
+
+    const messageMain =
+      document.getElementById('messageMain');
+
+    const messageSub =
+      document.getElementById('messageSub');
+
+    const progressShell =
+      document.getElementById('progressShell');
+
+    const progressFill =
+      document.getElementById('progressFill');
+
+    const progressNum =
+      document.getElementById('progressNum');
+
+    const spinner =
+      document.getElementById('spinner');
+
+    const successMark =
+      document.getElementById('successMark');
 
     let isSubmitting = false;
     let lastSubmittedCode = '';
@@ -353,7 +487,6 @@
     let entranceAudio = null;
     let audioReady = false;
     let isGuideLoud = false;
-    let isGuideCoolingDown = false;
     let guidePlayTimer = null;
     let guideCooldownTimer = null;
 
@@ -367,16 +500,26 @@
     }
 
     function sleep(ms) {
-      return new Promise(resolve => setTimeout(resolve, ms));
+      return new Promise(resolve => {
+        setTimeout(resolve, ms);
+      });
     }
 
     function focusInput() {
-      codeInput.focus({ preventScroll: true });
+      try {
+        codeInput.focus({
+          preventScroll: true
+        });
+      } catch (error) {
+        codeInput.focus();
+      }
     }
 
     function getVolumeSet() {
       const hour = new Date().getHours();
-      return hour >= 21 ? VOLUME.night : VOLUME.day;
+      return hour >= 21
+        ? VOLUME.night
+        : VOLUME.day;
     }
 
     function initAudio() {
@@ -385,20 +528,26 @@
       bgmAudio.preload = 'auto';
       bgmAudio.volume = getVolumeSet().bgm;
 
-      entranceAudio = new Audio(ENTRANCE_AUDIO_URL);
+      entranceAudio =
+        new Audio(ENTRANCE_AUDIO_URL);
+
       entranceAudio.loop = true;
       entranceAudio.preload = 'auto';
-      entranceAudio.volume = getVolumeSet().guideIdle;
+      entranceAudio.volume =
+        getVolumeSet().guideIdle;
     }
 
     async function startAudio() {
-      if (!bgmAudio || !entranceAudio) initAudio();
+      if (!bgmAudio || !entranceAudio) {
+        initAudio();
+      }
 
       try {
-        const v = getVolumeSet();
+        const volume = getVolumeSet();
 
-        bgmAudio.volume = v.bgm;
-        entranceAudio.volume = v.guideIdle;
+        bgmAudio.volume = volume.bgm;
+        entranceAudio.volume =
+          volume.guideIdle;
 
         await bgmAudio.play();
         await entranceAudio.play();
@@ -406,7 +555,7 @@
         audioReady = true;
         audioStartBtn.classList.add('ready');
         focusInput();
-      } catch (err) {
+      } catch (error) {
         audioReady = false;
         audioStartBtn.classList.remove('ready');
         focusInput();
@@ -414,18 +563,30 @@
     }
 
     function updateAudioVolumes() {
-      if (!bgmAudio || !entranceAudio || !audioReady) return;
-
-      const v = getVolumeSet();
-
-      if (isGuideLoud) {
-        bgmAudio.volume = v.bgm * GUIDE_BGM_DUCKING_RATE;
-        entranceAudio.volume = v.guide;
+      if (
+        !bgmAudio ||
+        !entranceAudio ||
+        !audioReady
+      ) {
         return;
       }
 
-      bgmAudio.volume = v.bgm;
-      entranceAudio.volume = v.guideIdle;
+      const volume = getVolumeSet();
+
+      if (isGuideLoud) {
+        bgmAudio.volume =
+          volume.bgm *
+          GUIDE_BGM_DUCKING_RATE;
+
+        entranceAudio.volume =
+          volume.guide;
+
+        return;
+      }
+
+      bgmAudio.volume = volume.bgm;
+      entranceAudio.volume =
+        volume.guideIdle;
     }
 
     function clearGuideTimers() {
@@ -441,33 +602,44 @@
     }
 
     function playEntranceAnnouncement() {
-      if (!audioReady || !bgmAudio || !entranceAudio) return;
+      if (
+        !audioReady ||
+        !bgmAudio ||
+        !entranceAudio
+      ) {
+        return;
+      }
 
       clearGuideTimers();
 
-      const v = getVolumeSet();
+      const volume = getVolumeSet();
 
       isGuideLoud = true;
-      isGuideCoolingDown = false;
 
       try {
         entranceAudio.currentTime = 0;
-      } catch (err) {}
+      } catch (error) {}
 
-      bgmAudio.volume = v.bgm * GUIDE_BGM_DUCKING_RATE;
-      entranceAudio.volume = v.guide;
+      bgmAudio.volume =
+        volume.bgm *
+        GUIDE_BGM_DUCKING_RATE;
+
+      entranceAudio.volume =
+        volume.guide;
 
       guidePlayTimer = setTimeout(() => {
         isGuideLoud = false;
-        isGuideCoolingDown = true;
 
-        entranceAudio.volume = v.guideIdle;
-        bgmAudio.volume = getVolumeSet().bgm;
+        entranceAudio.volume =
+          getVolumeSet().guideIdle;
 
-        guideCooldownTimer = setTimeout(() => {
-          isGuideCoolingDown = false;
-          updateAudioVolumes();
-        }, GUIDE_COOLDOWN_MS);
+        bgmAudio.volume =
+          getVolumeSet().bgm;
+
+        guideCooldownTimer =
+          setTimeout(() => {
+            updateAudioVolumes();
+          }, GUIDE_COOLDOWN_MS);
       }, GUIDE_PLAY_DURATION_MS);
     }
 
@@ -484,57 +656,92 @@
       spinner.style.display = 'none';
       successMark.style.display = 'none';
 
-      messageMain.textContent = '通行許可証・住民登録証を\nスキャンしてください。';
+      messageMain.textContent =
+        '通行許可証・住民登録証を\n' +
+        'スキャンしてください。';
+
       messageSub.textContent = '';
-      messageSub.classList.remove('error-note');
+      messageSub.classList.remove(
+        'error-note'
+      );
     }
 
     function scheduleReset(ms) {
-      if (resetTimer) clearTimeout(resetTimer);
+      if (resetTimer) {
+        clearTimeout(resetTimer);
+      }
 
       resetTimer = setTimeout(() => {
         codeInput.value = '';
         resetVisualState();
+
         isSubmitting = false;
         submitBtn.disabled = false;
+
         focusInput();
       }, ms);
     }
 
-    function playTone(freq, duration, gainValue = 0.035) {
+    function playTone(
+      frequency,
+      duration,
+      gainValue = 0.035
+    ) {
       try {
-        const ctx = new (window.AudioContext || window.webkitAudioContext)();
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
+        const AudioContextClass =
+          window.AudioContext ||
+          window.webkitAudioContext;
 
-        osc.type = 'sine';
-        osc.frequency.value = freq;
+        const context =
+          new AudioContextClass();
+
+        const oscillator =
+          context.createOscillator();
+
+        const gain =
+          context.createGain();
+
+        oscillator.type = 'sine';
+        oscillator.frequency.value =
+          frequency;
+
         gain.gain.value = gainValue;
 
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-        osc.start();
+        oscillator.connect(gain);
+        gain.connect(context.destination);
+        oscillator.start();
 
         setTimeout(() => {
-          osc.stop();
-          ctx.close();
+          oscillator.stop();
+          context.close();
         }, duration);
-      } catch (e) {}
+      } catch (error) {}
     }
 
     function playSuccessSound() {
       playTone(784, 120);
-      setTimeout(() => playTone(1046, 150), 130);
+
+      setTimeout(() => {
+        playTone(1046, 150);
+      }, 130);
     }
 
     function playErrorSound() {
       playTone(280, 170, 0.03);
-      setTimeout(() => playTone(230, 190, 0.03), 180);
+
+      setTimeout(() => {
+        playTone(230, 190, 0.03);
+      }, 180);
     }
 
     function isDuplicateRecently(code) {
       const now = Date.now();
-      return code && code === lastSubmittedCode && (now - lastSubmittedAt) < 2000;
+
+      return (
+        code &&
+        code === lastSubmittedCode &&
+        now - lastSubmittedAt < 2000
+      );
     }
 
     function startProgressAnimation() {
@@ -544,83 +751,201 @@
       }
 
       let percent = 0;
+
       progressShell.style.display = '';
       progressFill.style.width = '0%';
       progressNum.textContent = '0%';
 
       const timer = setInterval(() => {
-        percent = Math.min(percent + 4, 96);
-        progressFill.style.width = percent + '%';
-        progressNum.textContent = percent + '%';
+        percent = Math.min(
+          percent + 4,
+          96
+        );
+
+        progressFill.style.width =
+          percent + '%';
+
+        progressNum.textContent =
+          percent + '%';
       }, 80);
 
-      progressStopper = function stopProgress(complete) {
-        clearInterval(timer);
-        if (complete) {
-          progressFill.style.width = '100%';
-          progressNum.textContent = '100%';
-        } else {
-          progressFill.style.width = '0%';
-          progressNum.textContent = '0%';
-        }
-      };
+      progressStopper =
+        function stopProgress(complete) {
+          clearInterval(timer);
+
+          if (complete) {
+            progressFill.style.width =
+              '100%';
+
+            progressNum.textContent =
+              '100%';
+          } else {
+            progressFill.style.width =
+              '0%';
+
+            progressNum.textContent =
+              '0%';
+          }
+        };
 
       return progressStopper;
     }
 
     function mapErrorMessage(reason) {
       if (reason === 'empty_customer_code') {
-        return '通行許可証・住民登録証を読み取れませんでした。\nもう一度お試しください。';
+        return (
+          '通行許可証・住民登録証を' +
+          '読み取れませんでした。\n' +
+          'もう一度お試しください。'
+        );
       }
+
       if (reason === 'customer_not_found') {
-        return '会員情報を確認できませんでした。\n公式LINEの会員登録をご確認ください。';
+        return (
+          '会員情報を確認できませんでした。\n' +
+          '公式LINEの会員登録をご確認ください。'
+        );
       }
+
       if (reason === 'rank_not_allowed') {
-        return '通行許可証・住民登録証を確認できませんでした。\n会員情報をご確認ください。';
+        return (
+          '通行許可証・住民登録証を' +
+          '確認できませんでした。\n' +
+          '会員情報をご確認ください。'
+        );
       }
-      if (reason === 'Failed to fetch') {
-        return '通信に失敗しました。\n少し時間をあけてもう一度お試しください。';
+
+      if (
+        reason === 'network_error' ||
+        reason === 'invalid_json' ||
+        reason === 'request_timeout'
+      ) {
+        return (
+          '通信に失敗しました。\n' +
+          '少し時間をあけて' +
+          'もう一度お試しください。'
+        );
       }
-      return 'うまく確認できませんでした。\nもう一度お試しください。';
+
+      return (
+        'うまく確認できませんでした。\n' +
+        'もう一度お試しください。'
+      );
     }
 
-    async function postEntryCheck(customerCode) {
+    /*
+     * 通信上の失敗だけを判定します。
+     * 会員未登録・ランク不一致などは再試行しません。
+     */
+    function isRetryableCommunicationError(
+      result
+    ) {
+      if (!result) {
+        return true;
+      }
+
+      const error =
+        String(result.error || '');
+
+      return (
+        error === 'network_error' ||
+        error === 'invalid_json' ||
+        error === 'request_timeout' ||
+        error.startsWith('http_')
+      );
+    }
+
+    async function postEntryCheck(
+      customerCode
+    ) {
       try {
-        const res = await fetch(WORKER_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-          body: JSON.stringify({ action: 'entry_check', customerCode })
-        });
+        const response = await fetch(
+          WORKER_URL,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type':
+                'text/plain;charset=utf-8'
+            },
+            body: JSON.stringify({
+              action: 'entry_check',
+              customerCode
+            })
+          }
+        );
 
-        return await res.json().catch(() => ({ ok: false, error: 'invalid_json' }));
-      } catch (err) {
-        return { ok: false, error: String(err && err.message ? err.message : err) };
+        if (!response.ok) {
+          return {
+            ok: false,
+            error:
+              'http_' + response.status,
+            status: response.status
+          };
+        }
+
+        try {
+          return await response.json();
+        } catch (error) {
+          return {
+            ok: false,
+            error: 'invalid_json'
+          };
+        }
+      } catch (error) {
+        return {
+          ok: false,
+          error: 'network_error',
+          detail: String(
+            error && error.message
+              ? error.message
+              : error
+          )
+        };
       }
     }
 
-    async function postCheckinPoint(customerCode) {
+    async function postCheckinPoint(
+      customerCode
+    ) {
       try {
-        const res = await fetch(POINT_GAS_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-          body: JSON.stringify({
-            action: 'checkin_point',
-            customerCode,
-            source: 'door_html'
-          })
-        });
+        const response = await fetch(
+          POINT_GAS_URL,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type':
+                'text/plain;charset=utf-8'
+            },
+            body: JSON.stringify({
+              action: 'checkin_point',
+              customerCode,
+              source: 'door_html'
+            })
+          }
+        );
 
-        return await res.json().catch(() => ({ ok: false, error: 'invalid_json' }));
-      } catch (err) {
-        return { ok: false, error: String(err && err.message ? err.message : err) };
+        if (!response.ok) {
+          return {
+            ok: false,
+            error:
+              'http_' + response.status
+          };
+        }
+
+        try {
+          return await response.json();
+        } catch (error) {
+          return {
+            ok: false,
+            error: 'invalid_json'
+          };
+        }
+      } catch (error) {
+        return {
+          ok: false,
+          error: 'network_error'
+        };
       }
-    }
-
-    async function runBackgroundDoorRetries(customerCode) {
-      await sleep(2000);
-      postEntryCheck(customerCode).catch(() => {});
-      await sleep(2000);
-      postEntryCheck(customerCode).catch(() => {});
     }
 
     function showSuccess(customerCode) {
@@ -629,17 +954,37 @@
         progressStopper = null;
       }
 
-      progressShell.style.display = 'none';
+      progressShell.style.display =
+        'none';
+
       spinner.style.display = 'none';
       successMark.style.display = 'flex';
 
-      messageMain.textContent = 'ゲートが開きます。\nお足元に気をつけてお進みください。';
-      messageSub.textContent = 'COMPASSION WORLDでのひとときを、\nどうぞごゆっくりお過ごしください。';
-      messageSub.classList.remove('error-note');
+      messageMain.textContent =
+        'ゲートが開きます。\n' +
+        'お足元に気をつけて' +
+        'お進みください。';
+
+      messageSub.textContent =
+        'COMPASSION WORLDでの' +
+        'ひとときを、\n' +
+        'どうぞごゆっくり' +
+        'お過ごしください。';
+
+      messageSub.classList.remove(
+        'error-note'
+      );
 
       playSuccessSound();
-      postCheckinPoint(customerCode).catch(() => {});
-      runBackgroundDoorRetries(customerCode).catch(() => {});
+
+      /*
+       * ポイント付与処理だけを送信します。
+       * ここではドア開放処理を再送しません。
+       */
+      postCheckinPoint(
+        customerCode
+      ).catch(() => {});
+
       scheduleReset(20000);
     }
 
@@ -656,34 +1001,62 @@
       spinner.style.display = 'none';
       successMark.style.display = 'none';
 
-      messageMain.textContent = mapErrorMessage(reason);
-      messageSub.textContent = '再試行してもゲートが開かない場合、\n公式LINEのリッチメニューから、\nヘルプチャットにてお問い合わせください。';
-      messageSub.classList.add('error-note');
+      messageMain.textContent =
+        mapErrorMessage(reason);
+
+      messageSub.textContent =
+        '再試行してもゲートが' +
+        '開かない場合、\n' +
+        '公式LINEのリッチメニューから、\n' +
+        'ヘルプチャットにて' +
+        'お問い合わせください。';
+
+      messageSub.classList.add(
+        'error-note'
+      );
 
       playErrorSound();
       scheduleReset(10000);
     }
 
     async function submitCode(rawCode) {
-      const customerCode = normalizeCustomerCode(rawCode);
+      const customerCode =
+        normalizeCustomerCode(rawCode);
 
       if (!customerCode) {
-        showError('empty_customer_code');
+        showError(
+          'empty_customer_code'
+        );
         return;
       }
 
-      if (isSubmitting) return;
+      if (isSubmitting) {
+        return;
+      }
 
-      if (isDuplicateRecently(customerCode)) {
+      if (
+        isDuplicateRecently(
+          customerCode
+        )
+      ) {
         if (progressStopper) {
           progressStopper(false);
           progressStopper = null;
         }
 
         resetVisualState();
-        messageMain.textContent = '確認が重なっているため、\n少し待ってからもう一度お試しください。';
+
+        messageMain.textContent =
+          '確認が重なっているため、\n' +
+          '少し待ってから' +
+          'もう一度お試しください。';
+
         messageSub.textContent = '';
-        messageSub.classList.add('error-note');
+
+        messageSub.classList.add(
+          'error-note'
+        );
+
         playErrorSound();
         scheduleReset(10000);
         return;
@@ -691,79 +1064,164 @@
 
       isSubmitting = true;
       submitBtn.disabled = true;
-      lastSubmittedCode = customerCode;
-      lastSubmittedAt = Date.now();
+
+      lastSubmittedCode =
+        customerCode;
+
+      lastSubmittedAt =
+        Date.now();
 
       resetVisualState();
 
-      messageMain.textContent = '通行許可証・住民登録証をスキャンしました。\nお客さま情報を照会しています。';
-      messageSub.textContent = '確認が完了しましたら、\nゲートが自動で開きます。';
+      messageMain.textContent =
+        '通行許可証・住民登録証を' +
+        'スキャンしました。\n' +
+        'お客さま情報を' +
+        '照会しています。';
+
+      messageSub.textContent =
+        '確認が完了しましたら、\n' +
+        'ゲートが自動で開きます。';
 
       playEntranceAnnouncement();
 
-      const stopProgress = startProgressAnimation();
+      const stopProgress =
+        startProgressAnimation();
 
-      const firstResult = await postEntryCheck(customerCode);
+      /*
+       * 1回目の認証・ドア開放リクエスト
+       */
+      let result =
+        await postEntryCheck(
+          customerCode
+        );
 
-      if (firstResult && firstResult.ok) {
+      if (result && result.ok) {
         stopProgress(true);
         progressStopper = null;
+
         await sleep(250);
+
         showSuccess(customerCode);
         return;
       }
 
-      progressShell.style.display = 'none';
-      spinner.style.display = 'block';
+      /*
+       * 会員未登録やランク不一致など、
+       * GASから正常な拒否結果が返った場合は
+       * 再試行しません。
+       */
+      if (
+        !isRetryableCommunicationError(
+          result
+        )
+      ) {
+        showError(
+          result.reason ||
+          result.error
+        );
+        return;
+      }
 
-      const secondResult = await postEntryCheck(customerCode);
+      /*
+       * 通信エラーの場合のみ1回だけ再試行
+       */
+      progressShell.style.display =
+        'none';
 
-      if (secondResult && secondResult.ok) {
+      spinner.style.display =
+        'block';
+
+      messageMain.textContent =
+        '通信を再確認しています。';
+
+      messageSub.textContent =
+        'そのまま少々お待ちください。';
+
+      await sleep(
+        NETWORK_RETRY_DELAY_MS
+      );
+
+      result =
+        await postEntryCheck(
+          customerCode
+        );
+
+      if (result && result.ok) {
         showSuccess(customerCode);
         return;
       }
 
-      await sleep(1000);
-
-      const thirdResult = await postEntryCheck(customerCode);
-
-      if (thirdResult && thirdResult.ok) {
-        showSuccess(customerCode);
-        return;
-      }
-
-      showError(thirdResult && (thirdResult.reason || thirdResult.error));
+      showError(
+        result &&
+        (
+          result.reason ||
+          result.error
+        )
+      );
     }
 
-    submitBtn.addEventListener('click', () => {
-      submitCode(codeInput.value);
-    });
-
-    codeInput.addEventListener('keydown', (event) => {
-      if (event.key === 'Enter') {
-        event.preventDefault();
-        submitCode(codeInput.value);
+    submitBtn.addEventListener(
+      'click',
+      () => {
+        submitCode(
+          codeInput.value
+        );
       }
-    });
+    );
 
-    codeInput.addEventListener('input', () => {
-      codeInput.value = normalizeCustomerCode(codeInput.value);
-    });
+    codeInput.addEventListener(
+      'keydown',
+      event => {
+        if (event.key === 'Enter') {
+          event.preventDefault();
 
-    audioStartBtn.addEventListener('click', () => {
-      startAudio();
-    });
+          submitCode(
+            codeInput.value
+          );
+        }
+      }
+    );
 
-    window.addEventListener('load', () => {
-      initAudio();
-      resetVisualState();
-      focusInput();
-      setInterval(updateAudioVolumes, 60000);
-    });
+    codeInput.addEventListener(
+      'input',
+      () => {
+        codeInput.value =
+          normalizeCustomerCode(
+            codeInput.value
+          );
+      }
+    );
 
-    window.addEventListener('click', () => {
-      if (!isSubmitting) focusInput();
-    });
+    audioStartBtn.addEventListener(
+      'click',
+      () => {
+        startAudio();
+      }
+    );
+
+    window.addEventListener(
+      'load',
+      () => {
+        initAudio();
+        resetVisualState();
+        focusInput();
+
+        setInterval(
+          updateAudioVolumes,
+          60000
+        );
+      }
+    );
+
+    window.addEventListener(
+      'click',
+      () => {
+        if (!isSubmitting) {
+          focusInput();
+        }
+      }
+    );
   </script>
 </body>
 </html>
