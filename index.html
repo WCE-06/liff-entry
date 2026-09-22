@@ -413,7 +413,7 @@
 
   <script>
     const WORKER_URL =
-      'https://script.google.com/macros/s/AKfycbzWlGKM3xvwUhZbKcT2NPJBreNEPWzW-W-giNrihVS-WBoBAhpN92A4OXW-aVltutVTjg/exec';
+      'https://script.google.com/macros/s/AKfycbyZliqol4PRMnY_CTX7M_52_ecJqYxdqx4mZAfe8Cm1Cy33iAKJxat1v-HhlvRtSfF4/exec';
 
     const POINT_GAS_URL =
       'https://script.google.com/macros/s/AKfycbwWdVJo6yC6RL3IjJcjueePaIpyo-H7Mh5TGUSqvYEMyZk3Lup8Hcf-JZgsXa-fQB85SA/exec';
@@ -1161,20 +1161,16 @@
           2
         );
 
-      /*
-       * 会員未登録やランク不一致など、
-       * GASから正常な拒否結果が返った場合は
-       * 再試行しません。
-       */
-      if (
-        !isRetryableCommunicationError(
-          result
-        ) &&
-        !(result && result.ok)
-      ) {
+      if (!result || !result.ok) {
         showError(
-          result.reason ||
-          result.error
+          (
+            result &&
+            (
+              result.reason ||
+              result.error
+            )
+          ) ||
+          'network_error'
         );
         return;
       }
