@@ -759,7 +759,7 @@
       const timer = setInterval(() => {
         percent = Math.min(
           percent + 4,
-          96
+          94
         );
 
         progressFill.style.width =
@@ -855,8 +855,24 @@
       );
     }
 
-    async function postEntryCheck(
-      customerCode
+    function createRequestId() {
+      if (
+        window.crypto &&
+        typeof window.crypto.randomUUID === 'function'
+      ) {
+        return window.crypto.randomUUID();
+      }
+
+      return (
+        Date.now().toString(36) + '-' +
+        Math.random().toString(36).slice(2)
+      );
+    }
+
+    async function postEntryAction(
+      action,
+      customerCode,
+      requestId
     ) {
       try {
         const response = await fetch(
@@ -868,8 +884,9 @@
                 'text/plain;charset=utf-8'
             },
             body: JSON.stringify({
-              action: 'entry_check',
-              customerCode
+              action,
+              customerCode,
+              requestId
             })
           }
         );
@@ -902,6 +919,47 @@
           )
         };
       }
+    }
+
+    async function postEntryActionWithRetry(
+      action,
+      customerCode,
+      requestId,
+      attempts
+    ) {
+      let result = null;
+
+      for (
+        let attempt = 1;
+        attempt <= attempts;
+        attempt += 1
+      ) {
+        result = await postEntryAction(
+          action,
+          customerCode,
+          requestId
+        );
+
+        const pending =
+          result &&
+          result.reason ===
+            'entry_commit_processing';
+
+        if (
+          !isRetryableCommunicationError(result) &&
+          !pending
+        ) {
+          return result;
+        }
+
+        if (attempt < attempts) {
+          await sleep(
+            NETWORK_RETRY_DELAY_MS * attempt
+          );
+        }
+      }
+
+      return result;
     }
 
     async function postCheckinPoint(
@@ -1071,6 +1129,9 @@
       lastSubmittedAt =
         Date.now();
 
+      const requestId =
+        createRequestId();
+
       resetVisualState();
 
       messageMain.textContent =
@@ -1089,11 +1150,48 @@
         startProgressAnimation();
 
       /*
-       * 1回目の認証・ドア開放リクエスト
+       * 会員確認と開錠指示を同じ受付IDで連続処理します。
+       * 進捗100%は開錠指示の成功後だけ表示します。
        */
       let result =
-        await postEntryCheck(
-          customerCode
+        await postEntryActionWithRetry(
+          'entry_prepare',
+          customerCode,
+          requestId,
+          2
+        );
+
+      /*
+       * 会員未登録やランク不一致など、
+       * GASから正常な拒否結果が返った場合は
+       * 再試行しません。
+       */
+      if (
+        !isRetryableCommunicationError(
+          result
+        ) &&
+        !(result && result.ok)
+      ) {
+        showError(
+          result.reason ||
+          result.error
+        );
+        return;
+      }
+
+      messageMain.textContent =
+        '入店許可を確認しています。';
+
+      messageSub.textContent =
+        '会員確認とゲート開錠を' +
+        '続けて行っています。';
+
+      result =
+        await postEntryActionWithRetry(
+          'entry_commit',
+          customerCode,
+          requestId,
+          2
         );
 
       if (result && result.ok) {
@@ -1106,11 +1204,6 @@
         return;
       }
 
-      /*
-       * 会員未登録やランク不一致など、
-       * GASから正常な拒否結果が返った場合は
-       * 再試行しません。
-       */
       if (
         !isRetryableCommunicationError(
           result
@@ -1143,8 +1236,11 @@
       );
 
       result =
-        await postEntryCheck(
-          customerCode
+        await postEntryActionWithRetry(
+          'entry_commit',
+          customerCode,
+          requestId,
+          1
         );
 
       if (result && result.ok) {
