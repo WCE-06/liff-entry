@@ -1163,40 +1163,17 @@
       const stopProgress =
         startProgressAnimation();
 
-      /*
-       * 会員確認と開錠指示を同じ受付IDで連続処理します。
-       * 進捗100%は開錠指示の成功後だけ表示します。
-       */
-      let result =
-        await postEntryActionWithRetry(
-          'entry_prepare',
-          customerCode,
-          requestId,
-          2
-        );
-
-      if (!result || !result.ok) {
-        showError(
-          (
-            result &&
-            (
-              result.reason ||
-              result.error
-            )
-          ) ||
-          'network_error'
-        );
-        return;
-      }
-
       messageMain.textContent =
         '入店許可を確認しています。';
 
       messageSub.textContent =
-        '会員確認とゲート開錠を' +
-        '続けて行っています。';
+        '確認後すぐにゲートを開きます。';
 
-      result =
+      /*
+       * 会員確認と開錠指示を1回の送信にまとめます。
+       * 進捗100%は開錠指示の成功後だけ表示します。
+       */
+      let result =
         await postEntryActionWithRetry(
           'entry_commit',
           customerCode,
